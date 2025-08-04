@@ -1,0 +1,173 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model roles {
+  id         Int      @id @default(autoincrement())
+  name       String   @unique
+  created_at   DateTime @default(now())
+  users      users[]
+}
+
+model users {
+  id           Int      @id @default(autoincrement())
+  full_name    String
+  email        String
+  phone_number String?
+  password     String
+  role_id      Int?
+  status       Boolean  @default(true)
+  created_at   DateTime @default(now())
+  updated_at   DateTime @updatedAt
+  roles        roles?   @relation(fields: [role_id], references: [id])
+  restaurants  restaurants[] @relation("OwnerRestaurants")
+  cart_items   cart_items[]
+  address_book address_book[]
+  orders       orders[]
+}
+
+model floors {
+  id         Int      @id @default(autoincrement())
+  identifier String
+  status     Boolean?
+  created_at   DateTime @default(now())
+  updated_at   DateTime @updatedAt
+  restaurants restaurants[]
+}
+
+model restaurants {
+  id            Int           @id @default(autoincrement())
+  name          String
+  address       String?
+  contact_number String?
+  floor_id      Int?
+  owner_id      Int?
+  is_active     Boolean?
+  created_at   DateTime @default(now())
+  updated_at   DateTime @updatedAt
+  floors        floors?       @relation(fields: [floor_id], references: [id])
+  users         users?        @relation("OwnerRestaurants", fields: [owner_id], references: [id])
+  menu_categories menu_categories[]
+  menu_items    menu_items[]
+  orders        orders[]
+}
+
+model menu_categories {
+  id           Int         @id @default(autoincrement())
+  restaurant_id Int?
+  name         String
+  is_available Boolean     @default(true)
+  created_at   DateTime @default(now())
+  updated_at   DateTime @updatedAt
+  restaurants  restaurants? @relation(fields: [restaurant_id], references: [id])
+  menu_items   menu_items[]
+}
+
+model menu_items {
+  id           Int            @id @default(autoincrement())
+  restaurant_id Int?
+  category_id  Int?
+  name         String
+  description  String?
+  price        Int
+  is_available Boolean        @default(true)
+  image_url    String?
+  created_at   DateTime @default(now())
+  updated_at   DateTime @updatedAt
+  restaurants  restaurants?   @relation(fields: [restaurant_id], references: [id])
+  menu_categories menu_categories? @relation(fields: [category_id], references: [id])
+  daily_meals  daily_meals[]
+  cart_items   cart_items[]
+  order_items  order_items[]
+}
+
+model daily_meals {
+  id           Int      @id @default(autoincrement())
+  menu_item_id Int?
+  available_on DateTime?
+  meal_type    String?
+  created_at   DateTime @default(now())
+  updated_at   DateTime @updatedAt
+  menu_items   menu_items? @relation(fields: [menu_item_id], references: [id])
+}
+
+model cart_items {
+  id           Int      @id @default(autoincrement())
+  user_id      Int?
+  menu_item_id Int?
+  quantity     Int      @default(1)
+  created_at   DateTime @default(now())
+  updated_at   DateTime @updatedAt
+  users        users?   @relation(fields: [user_id], references: [id])
+  menu_items   menu_items? @relation(fields: [menu_item_id], references: [id])
+}
+
+model order_status {
+  id     Int     @id @default(autoincrement())
+  status String  @unique
+  orders orders[]
+}
+
+model address_book {
+  id        Int      @id @default(autoincrement())
+  user_id   Int?
+  label     String?
+  address   String?
+  latitude  Float?
+  longitude Float?
+  created_at   DateTime @default(now())
+  updated_at   DateTime @updatedAt
+  users     users?   @relation(fields: [user_id], references: [id])
+  orders    orders[]
+}
+
+model orders {
+  id                 Int           @id @default(autoincrement())
+  user_id            Int?
+  restaurant_id      Int?
+  order_status_id    Int?
+  order_type         String        @default("takeaway")
+  rejected_reason    String?
+  total_amount       Int
+  delivery_address_id Int?
+  created_at   DateTime @default(now())
+  updated_at   DateTime @updatedAt
+  completed_at       DateTime?
+  users              users?        @relation(fields: [user_id], references: [id])
+  restaurants        restaurants?  @relation(fields: [restaurant_id], references: [id])
+  order_status       order_status? @relation(fields: [order_status_id], references: [id])
+  address_book       address_book? @relation(fields: [delivery_address_id], references: [id])
+  order_items        order_items[]
+  payments           payments[]
+}
+
+model order_items {
+  id           Int      @id @default(autoincrement())
+  order_id     Int?
+  menu_item_id Int?
+  quantity     Int
+  price        Int
+  orders       orders?   @relation(fields: [order_id], references: [id])
+  menu_items   menu_items? @relation(fields: [menu_item_id], references: [id])
+}
+
+model payments {
+  id        Int      @id @default(autoincrement())
+  order_id  Int?
+  amount    Int
+  method    String?
+  status    String?
+  paid_at   DateTime?
+  orders    orders?   @relation(fields: [order_id], references: [id])
+}
