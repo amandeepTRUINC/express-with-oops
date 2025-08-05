@@ -1,0 +1,5 @@
+1. docker login
+2.  docker build -t amandeeptruinc/order-manage-app-backend:v1.0.2 .
+3. docker tag amandeeptruinc/order-manage-app-backend:v1.0.2 amandeeptruinc/order-manage-app-backend:latest // for tag purpose
+4. docker push amandeeptruinc/order-manage-app-backend:v1.0.2 
+5. docker-compose up --pull always --force-recreate // to run app on local

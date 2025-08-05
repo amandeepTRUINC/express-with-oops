@@ -1,0 +1,21 @@
+export const HTTP_STATUS_CODES = {
+  SUCCESS : 200,
+  CREATED: 201,
+  FORM_ERROR: 400,
+  UN_AUTHORIZED: 401,
+  FORBIDDEN: 403,
+  NOT_FOUND: 404,
+  ENTITY_ALREADY_EXISTS: 409,
+  TOO_MANY_REQUESTS: 429,
+  INTERNAL_SERVER_ERROR: 500
+}
+
+export const HTTP_STATUS_MESSAGES = {
+  SUCCESS : 'Success',
+  FORM_ERROR: 'Invalid Request',
+  UN_AUTHORIZED: 'Unauthorized Access',
+  FORBIDDEN_RESOURCE: 'Forbidden Resource',
+  NOTE_FOUND: 'Not Found',
+  INTERNAL_SERVER_ERROR: 'Internal Server Error',
+  INVALID_CREDENTIALS: 'Invalid Credentials'
+}

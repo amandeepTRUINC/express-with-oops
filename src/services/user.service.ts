@@ -1,132 +1,106 @@
 import { Prisma } from "@prisma/client";
-import { ICustomError, IHelperFunctions } from "../common/interfaces/common.interface";
-import { IUser, IUserRepository, IUserService } from "../common/interfaces/user.interface";
+import { ICustomError } from "../interfaces/common.interface";
+import { IUser } from "../interfaces/user.interface";
 import { userRepository } from "../repositories/user.repository";
-import { helperFunctions } from "../utils/helperFunctions";
+import { hashPassword, handleError } from "../utils/helperFunctions";
 import { userPublicFields } from "../db/commonSelectQueries";
-import { IRolesService } from "../common/interfaces/roles.interface";
 import { CustomError } from "../utils/error";
-import rolesService from "./roles.service";
+import { getDefaultRole } from "./roles.service";
+import { HTTP_STATUS_CODES } from "../constants/common";
 
-class UserService implements IUserService {
-
-  constructor(
-    private userRepository: IUserRepository,
-    private helperFunctions: IHelperFunctions,
-    private rolesService: IRolesService
-  ) { }
-
-  async createUser (requestBody: Partial<IUser>): Promise<number | ICustomError> {
-    try {
-      const defaultRole = await this.rolesService.getDefaultRole().catch((error) => {
-        throw error
-      })
-      // checking if user with combination of email/mobile_number
-      const {
-        full_name,
-        email,
-        phone_number,
-        password
-      } = requestBody
-      const userExistence = await this.getUserDetails({ email, phone_number })
-      if (userExistence) {
-        throw new CustomError({
-          message: "User will same Email and Mobile Number",
-          status: 409
-        })
-      }
-      const hashedPassword = await this.helperFunctions.hashPassword(password as string)
-      const userObject = {
-        full_name,
-        email,
-        phone_number,
-        password: hashedPassword,
-        role_id: defaultRole.id
-      }
-      const createdUserId = await this.userRepository.createUser(userObject as Prisma.usersCreateArgs['data']).catch(error => {
-        throw error
-      })
-      return createdUserId
-    } catch (error) {
-      return this.helperFunctions.handleError(error)
+export async function createUser (requestBody: Partial<IUser>): Promise<number | ICustomError> {
+  try {
+    const defaultRole = await getDefaultRole().catch((error: any) => { throw error });
+    const { full_name, email, phone_number, password } = requestBody;
+    const userExistence = await getUserDetails({ email, phone_number });
+    if (userExistence) {
+      throw new CustomError({
+        message: "User will same Email and Mobile Number",
+        status: HTTP_STATUS_CODES.ENTITY_ALREADY_EXISTS
+      });
     }
+    const hashedPassword = await hashPassword(password as string);
+    const userObject = {
+      full_name,
+      email,
+      phone_number,
+      password: hashedPassword,
+      role_id: defaultRole.id
+    };
+    const createdUserId = await userRepository.createUser(userObject as Prisma.usersCreateArgs['data']).catch(error => { throw error });
+    return createdUserId;
+  } catch (error) {
+    return handleError(error);
   }
+}
 
-  async getUserDetails (whereCondition: object): Promise<IUser | ICustomError> {
-    try {
-      const userDetails = await this.userRepository.fetchSingleUser({
-        where: {
-          ...whereCondition
-        },
-        select: userPublicFields
-      })
-      return userDetails
-    } catch (error) {
-      return this.helperFunctions.handleError(error)
-    }
+export async function getUserDetails (whereCondition: object): Promise<IUser | ICustomError> {
+  try {
+    const userDetails = await userRepository.fetchSingleUser({
+      where: { ...whereCondition },
+      select: userPublicFields
+    });
+    return userDetails;
+  } catch (error) {
+    return handleError(error);
   }
+}
 
-  async getAllUser (): Promise<IUser[] | ICustomError> {
-    try {
-      return this.userRepository.fetchMultipleUsers({
-        select: userPublicFields
-      }).catch((error) => {
-        throw error
-      })
-    } catch (error) {
-      return this.helperFunctions.handleError(error)
-    }
+export async function getAllUser (): Promise<IUser[] | ICustomError> {
+  try {
+    return userRepository.fetchMultipleUsers({
+      select: userPublicFields
+    }).catch((error) => { throw error });
+  } catch (error) {
+    return handleError(error);
   }
+}
 
-  async updateUser (whereCondtion: object, updatedData: IUser): Promise<IUser | ICustomError> {
-    let existingUserDetails = await this.userRepository.fetchSingleUser({
-      where: {
-        ...whereCondtion
-      }
-    })
+export async function updateUser (whereCondtion: object, updatedData: IUser): Promise<IUser | ICustomError> {
+  try {
+    let existingUserDetails = await userRepository.fetchSingleUser({
+      where: { ...whereCondtion }
+    });
     if (!existingUserDetails) {
       throw new CustomError({
         message: 'User not found',
-        status: 404
-      })
+        status: HTTP_STATUS_CODES.NOT_FOUND
+      });
     }
-
-    // validating duplicacy for email and mobileNumber
-    existingUserDetails = await this.userRepository.fetchSingleUser({
+    existingUserDetails = await userRepository.fetchSingleUser({
       where: {
         email: updatedData.email,
         phone_number: updatedData.phone_number,
-        NOT: {
-          id: updatedData.id
-        }
+        NOT: { id: updatedData.id }
       }
-    })
+    });
     if (existingUserDetails) {
       throw new CustomError({
         message: 'User with same details already exist',
-        status: 409
-      })
+        status: HTTP_STATUS_CODES.ENTITY_ALREADY_EXISTS
+      });
     }
-    await this.userRepository.updateSingleUser({ id: updatedData.id }, updatedData).catch((error) => {
-      throw error
-    })
-    return updatedData
+    await userRepository.updateSingleUser({ id: updatedData.id }, updatedData as unknown as Prisma.usersUpdateArgs["data"]).catch((error) => { throw error });
+    return updatedData;
+  } catch (error) {
+    return handleError(error)
   }
-
-  async deleteUser (whereCondtion: object): Promise<void | ICustomError> {
-    try {
-      return await this.userRepository.deleteUsers({
-        where: {
-          ...whereCondtion
-        }
-      } as Prisma.usersDeleteArgs).catch((error) => {
-        throw error
-      })
-    } catch (error) {
-      return this.helperFunctions.handleError(error)
-    }
-  }
-
 }
 
-export const userService = new UserService(userRepository, helperFunctions, rolesService)
+export async function deleteUser (whereCondtion: object): Promise<void | ICustomError> {
+  try {
+    return await userRepository.deleteUsers({
+      where: { ...whereCondtion }
+    } as Prisma.usersDeleteArgs).catch((error) => { throw error });
+  } catch (error) {
+    return handleError(error);
+  }
+}
+
+export const userService = {
+  createUser,
+  getUserDetails,
+  getAllUser,
+  updateUser,
+  deleteUser
+};

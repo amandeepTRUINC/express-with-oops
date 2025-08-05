@@ -1,11 +1,11 @@
-import { ICustomError } from "../common/interfaces/common.interface";
+import { ICustomError } from "../interfaces/common.interface";
 
 export class CustomError implements ICustomError {
   public message: string;
   public status: number;
   public extraMessage: unknown
-  constructor({ message, status, extraMessage}: ICustomError) {
-    this.message = message;
+  constructor({ message, status, extraMessage }: ICustomError) {
+    this.message = message || '';
     this.status = status as number;
     this.extraMessage = extraMessage
   }

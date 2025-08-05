@@ -1,28 +1,26 @@
-import { PrismaClient } from "@prisma/client";
+import { HTTP_STATUS_CODES } from "../constants/common";
 import { prisma } from "../db/dbConnection";
-import { IRolesRepository, IRoles } from "../common/interfaces/roles.interface";
+import { IRoles } from "../interfaces/roles.interface";
 import { CustomError } from "../utils/error";
 
-class RolesRepository implements IRolesRepository {
-  constructor(private _prisma: PrismaClient) {}
+export const getDefaultRole = async (): Promise<IRoles> => {
+  try {
+    const role = await prisma.roles.findFirst({
+      where: { name: 'customer' },
+    });
 
-  async getDefaultRole(): Promise<IRoles> {
-    try {
-      const role = await this._prisma.roles.findFirst({
-        where: { name: 'customer' },
+    if (!role) {
+      throw new CustomError({
+        message: 'No Default Role Found',
+        status: HTTP_STATUS_CODES.NOT_FOUND
       });
-
-      if (!role) {
-        throw new CustomError({
-          message: 'No Default Role Found',
-          status: 404
-        });
-      }
-      return role;
-    } catch (error: unknown) {
-      throw error;
     }
+    return role;
+  } catch (error: unknown) {
+    throw error;
   }
 }
 
-export default new RolesRepository(prisma);
+export default {
+  getDefaultRole: getDefaultRole
+}
