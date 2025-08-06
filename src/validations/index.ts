@@ -7,9 +7,11 @@ import {
   createUserValidationsSchema, 
   updateUserValidationsSchema, 
   validateUserIdSchema, 
-  validateLoginUserReqSchema 
+  validateLoginUserReqSchema, 
+  validateUpdateStatusSchema
 } from './user.validationsSchema'
 import { HTTP_STATUS_CODES, HTTP_STATUS_MESSAGES } from '../constants/common';
+import { createRestaurantValidationsSchema } from './restaurant.validationsSchema';
 export const getRequestErrors = (schema: Joi.Schema) => {
   return (
     req: Request<any, any, any, any> | AuthenticatedRequest,
@@ -69,3 +71,7 @@ export const validateCreateUserReq = getRequestErrors(createUserValidationsSchem
 export const validateUpdateUserReq = getRequestErrors(updateUserValidationsSchema)
 export const validateUserIdInReq = getRequestErrors(validateUserIdSchema)
 export const validateLoginUserReq = getRequestErrors(validateLoginUserReqSchema)
+export const validateUpdateUserStatusReq = getRequestErrors(validateUpdateStatusSchema)
+
+
+export const validateCreateRestaurantReq = getRequestErrors(createRestaurantValidationsSchema)

@@ -5,7 +5,7 @@ import { userRepository } from "../repositories/user.repository";
 import { hashPassword, handleError } from "../utils/helperFunctions";
 import { userPublicFields } from "../db/commonSelectQueries";
 import { CustomError } from "../utils/error";
-import { getDefaultRole } from "./roles.service";
+import { getDefaultRole, getRoleDetails } from "./roles.service";
 import { HTTP_STATUS_CODES } from "../constants/common";
 
 export async function createUser (requestBody: Partial<IUser>): Promise<number | ICustomError> {
@@ -97,10 +97,38 @@ export async function deleteUser (whereCondtion: object): Promise<void | ICustom
   }
 }
 
+export async function updateUserRole (userId: number, role: string): Promise<void | ICustomError> {
+  try {
+    const userDetails = await userRepository.fetchSingleUser({
+      where: { id: userId }
+    })
+    if (!userDetails) {
+      throw new CustomError({
+        message: 'User not found',
+        status: HTTP_STATUS_CODES.NOT_FOUND
+      })
+    }
+
+    const roleDetails = await getRoleDetails(role)
+    if (!roleDetails) {
+      throw new CustomError({
+        message: 'Role not Found',
+        status: HTTP_STATUS_CODES.NOT_FOUND
+      })
+    }
+
+    await userRepository.updateSingleUser({ id: userId}, { role_id: roleDetails.id })
+    return
+  } catch (error) {
+    return handleError(error)
+  }
+}
+
 export const userService = {
   createUser,
   getUserDetails,
   getAllUser,
   updateUser,
-  deleteUser
+  deleteUser,
+  updateUserRole
 };

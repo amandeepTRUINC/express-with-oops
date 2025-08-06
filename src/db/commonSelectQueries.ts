@@ -11,5 +11,12 @@ export const userPublicFields = {
     select: {
       name: true
     }
-  }
+  },
+  restaurants: true,
+  cart_items: true,
+  address_book: true,
+  orders: true,
+  loyalty_points: true,
+  building: true,
+  floor: true
 }

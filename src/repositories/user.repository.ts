@@ -25,6 +25,7 @@ const fetchSingleUser = async (whereCondition: Prisma.usersFindFirstArgs): Promi
     const userDetails = await prisma.users.findFirst(whereCondition);
     return userDetails as IUser;
   } catch (error) {
+    console.log(error)
     throw error;
   }
 };
