@@ -4,8 +4,6 @@ import { handleErrorResponse, handleSuccessResponse } from "../utils/helperFunct
 import { userService } from "../services/user.service";
 import { CustomError } from "../utils/error";
 import { HTTP_STATUS_CODES } from "../constants/common";
-import { getRoleDetails } from "../services/roles.service";
-import { IUser } from "../interfaces/user.interface";
 export async function handleCreateUser (req: Request, res: Response): Promise<Response> {
   try {
     const createdUserId = await userService.createUser(req.body).catch((error) => {

@@ -1,9 +1,9 @@
 import { Router } from 'express'
-import { validateCreateRestaurantReq } from '../validations'
+import { validateCreateRestaurantReq, validateUpdateRestaurantReq, validateUpdateRestaurantStatusReq } from '../validations'
 import { authGuard } from '../guards/auth.guard'
 import { roleGuard } from '../guards/role.guard'
 import { roles_enum } from '../interfaces/roles.interface'
-import { handleCreateRestaurantReq, handleGetRestaurantListReq } from '../controller/restaurant.controller'
+import { handleCreateRestaurantReq, handleGetRestaurantDetailsReq, handleGetRestaurantListReq, handleUpdatedRestaurantReq, handleUpdatedRestaurantStatusReq } from '../controller/restaurant.controller'
 
 const router = Router()
 
@@ -22,6 +22,27 @@ router.get(
   handleGetRestaurantListReq
 )
 
+router.get(
+  '/:id',
+  authGuard,
+  handleGetRestaurantDetailsReq
+)
+
+router.put(
+  '/:id',
+  validateUpdateRestaurantReq,
+  authGuard,
+  roleGuard([roles_enum.ADMIN, roles_enum.RESTRAUNT_OWNER]),
+  handleUpdatedRestaurantReq
+)
+
+router.patch(
+  "/:id/status/:status", 
+  validateUpdateRestaurantStatusReq,
+  authGuard,
+  roleGuard([roles_enum.ADMIN]),
+  handleUpdatedRestaurantStatusReq
+)
 
 
 

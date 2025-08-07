@@ -32,4 +32,4 @@ COPY --from=builder /app/prisma ./prisma
 EXPOSE 8000
 
 # Run database migration (optional) & start app
-CMD ["sh", "-c", "npx prisma generate && npm run start:prod"]
+CMD ["sh", "-c", "npx prisma migrate deploy && npm run start:prod"]
