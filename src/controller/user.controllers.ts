@@ -4,7 +4,6 @@ import { handleErrorResponse, handleSuccessResponse } from "../utils/helperFunct
 import { userService } from "../services/user.service";
 import { CustomError } from "../utils/error";
 import { HTTP_STATUS_CODES } from "../constants/common";
-
 export async function handleCreateUser (req: Request, res: Response): Promise<Response> {
   try {
     const createdUserId = await userService.createUser(req.body).catch((error) => {
@@ -66,5 +65,16 @@ export async function handleUpdateUser (req: AuthenticatedRequest, res: Response
     return handleSuccessResponse({ res, message: 'SUCCESS', data: [updatedUserDeails] });
   } catch (error) {
     return handleErrorResponse(res, error);
+  }
+}
+
+export async function handleUpdateUserRole (req: AuthenticatedRequest, res: Response): Promise<Response> {
+  try {
+    const userId = parseInt(req.params.id)
+    const role = req.params.status
+    await userService.updateUserRole(userId, role)
+    return handleSuccessResponse({ res })
+  } catch (error) {
+    return handleErrorResponse(res, error)
   }
 }

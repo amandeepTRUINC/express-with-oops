@@ -1,7 +1,7 @@
 import { Router } from 'express';
 
-import { validateCreateUserReq, validateLoginUserReq, validateUpdateUserReq, validateUserIdInReq } from '../validations/index';
-import { handleGetAllUsers, handleGetUserDetails, handleCreateUser, handleUpdateUser, handleDeleteUser } from '../controller/user.controllers';
+import { validateCreateUserReq, validateLoginUserReq, validateUpdateUserReq, validateUpdateUserStatusReq, validateUserIdInReq } from '../validations/index';
+import { handleGetAllUsers, handleGetUserDetails, handleCreateUser, handleUpdateUser, handleDeleteUser, handleUpdateUserRole } from '../controller/user.controllers';
 import { handleLoginReq } from '../controller/auth.controller';
 import { authGuard } from '../guards/auth.guard';
 import { roleGuard } from '../guards/role.guard';
@@ -27,7 +27,7 @@ router.post('/',
   handleCreateUser
 )
 
-router.patch('/:id',
+router.put('/',
   authGuard,
   validateUpdateUserReq,
   handleUpdateUser
@@ -42,6 +42,12 @@ router.delete('/:id',
 router.post('/login',
   validateLoginUserReq,
   handleLoginReq
+)
+
+router.patch('/:id/status/:status',
+  roleGuard([roles_enum.ADMIN]),
+  validateUpdateUserStatusReq,
+  handleUpdateUserRole
 )
 
 export default router;

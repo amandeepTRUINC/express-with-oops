@@ -1,10 +1,11 @@
 import Joi from "joi";
+import { roles_enum } from "../interfaces/roles.interface";
 
-const validateUserIdSchema = Joi.object({
+export const validateUserIdSchema = Joi.object({
   id: Joi.number().required().integer()
 })
 
-const createUserValidationsSchema = Joi.object({
+export const createUserValidationsSchema = Joi.object({
   full_name: Joi.string().required().min(3).max(30),
   email: Joi.string().required().email(),
   phone_number: Joi.string().required().length(10).pattern(/^(	1[\-\s]?)?[0]?(91)?[789]\d{9}$/),
@@ -17,14 +18,14 @@ const createUserValidationsSchema = Joi.object({
     .required()
 })
 
-const updateUserValidationsSchema = Joi.object({
+export const updateUserValidationsSchema = Joi.object({
   id: Joi.number().required().greater(0),
   full_name: Joi.string().required().min(3).max(30),
   email: Joi.string().required().email(),
   phone_number: Joi.string().required().length(10).pattern(/^(	1[\-\s]?)?[0]?(91)?[789]\d{9}$/),
 });
 
-const validateLoginUserReqSchema = Joi.object({
+export const validateLoginUserReqSchema = Joi.object({
   identifier: Joi.string()
     .required()
     .custom((value, helpers) => {
@@ -40,4 +41,9 @@ const validateLoginUserReqSchema = Joi.object({
   password: Joi.string().min(6).required(), // adjust rules as needed
 });
 
-export { validateUserIdSchema, createUserValidationsSchema, updateUserValidationsSchema, validateLoginUserReqSchema };
+export const validateUpdateStatusSchema = Joi.object({
+  id: Joi.number().required().greater(0),
+  status: Joi.string()
+    .valid(...Object.values(roles_enum))
+    .required()
+});

@@ -16,106 +16,190 @@ datasource db {
 model roles {
   id         Int      @id @default(autoincrement())
   name       String   @unique
-  created_at   DateTime @default(now())
+  created_at DateTime @default(now())
   users      users[]
 }
 
 model users {
-  id           Int      @id @default(autoincrement())
-  full_name    String
-  email        String
-  phone_number String?
-  password     String
-  role_id      Int?
-  status       Boolean  @default(true)
-  created_at   DateTime @default(now())
-  updated_at   DateTime @updatedAt
-  roles        roles?   @relation(fields: [role_id], references: [id])
-  restaurants  restaurants[] @relation("OwnerRestaurants")
-  cart_items   cart_items[]
-  address_book address_book[]
-  orders       orders[]
+  id              Int      @id @default(autoincrement())
+  full_name       String
+  email           String   @unique
+  phone_number    String?
+  password        String
+  role_id         Int?
+  status          Boolean  @default(true)
+  email_verified  Boolean  @default(false)
+  phone_verified  Boolean  @default(false)
+  building_id     Int?     // Customer's building
+  floor_id        Int?     // Customer's floor
+  company_name    String?  // Customer's company
+  created_at      DateTime @default(now())
+  updated_at      DateTime @updatedAt
+  
+  // Relations
+  roles           roles?        @relation(fields: [role_id], references: [id])
+  restaurants     restaurants[] @relation("OwnerRestaurants")
+  cart_items      cart_items[]
+  address_book    address_book[]
+  orders          orders[]
+  ratings         restaurant_ratings[]
+  loyalty_points  loyalty_points[]
+  
+  // Building/Floor relations for customers
+  building        buildings?    @relation(fields: [building_id], references: [id])
+  floor           floors?       @relation(fields: [floor_id], references: [id])
+}
+
+model buildings {
+  id         Int      @id @default(autoincrement())
+  name       String
+  address    String
+  latitude   Float?
+  longitude  Float?
+  status     Boolean  @default(true)
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+  
+  // Relations
+  floors     floors[]
+  users      users[]  // Customers in this building
+  restaurant_buildings restaurant_buildings[]
 }
 
 model floors {
   id         Int      @id @default(autoincrement())
+  building_id Int
   identifier String
-  status     Boolean?
-  created_at   DateTime @default(now())
-  updated_at   DateTime @updatedAt
-  restaurants restaurants[]
+  floor_number Int
+  status     Boolean? @default(true)
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+  
+  // Relations
+  building   buildings @relation(fields: [building_id], references: [id])
+  users      users[]   // Customers on this floor
+  
+  @@unique([building_id, floor_number])
 }
 
 model restaurants {
-  id            Int           @id @default(autoincrement())
-  name          String
-  address       String?
-  contact_number String?
-  floor_id      Int?
-  owner_id      Int?
-  is_active     Boolean?
-  created_at   DateTime @default(now())
-  updated_at   DateTime @updatedAt
-  floors        floors?       @relation(fields: [floor_id], references: [id])
-  users         users?        @relation("OwnerRestaurants", fields: [owner_id], references: [id])
-  menu_categories menu_categories[]
-  menu_items    menu_items[]
-  orders        orders[]
+  id                    Int           @id @default(autoincrement())
+  name                  String
+  address               String?
+  contact_number        String?
+  owner_id              Int?
+  is_active             Boolean       @default(true)
+  approval_status       String        @default("pending") // pending, approved, rejected
+  commission_rate       Float         @default(5.0)      // Commission percentage (5% default)
+  estimated_prep_time   Int           @default(30)       // Default prep time for customer expectations
+  created_at            DateTime      @default(now())
+  updated_at            DateTime      @updatedAt
+  
+  // Relations
+  users                 users?        @relation("OwnerRestaurants", fields: [owner_id], references: [id])
+  menu_categories       menu_categories[]
+  menu_items            menu_items[]
+  orders                orders[]
+  ratings               restaurant_ratings[]
+  offers                offers[]
+  loyalty_rates         loyalty_rates[]
+  restaurant_buildings  restaurant_buildings[]
+  restaurant_shifts     restaurant_shifts[]
+}
+
+model restaurant_buildings {
+  id            Int         @id @default(autoincrement())
+  restaurant_id Int
+  building_id   Int
+  
+  // Relations
+  restaurant    restaurants @relation(fields: [restaurant_id], references: [id], onDelete: Cascade)
+  building      buildings   @relation(fields: [building_id], references: [id], onDelete: Cascade)
+  
+  @@unique([restaurant_id, building_id])
+}
+
+model restaurant_shifts {
+  id            Int         @id @default(autoincrement())
+  restaurant_id Int
+  day_of_week   Int         // 0-6 (Sunday to Saturday)
+  open_time     String      // HH:MM format
+  close_time    String      // HH:MM format
+  is_active     Boolean     @default(true)
+  
+  // Relations
+  restaurant    restaurants @relation(fields: [restaurant_id], references: [id], onDelete: Cascade)
+  
+  @@unique([restaurant_id, day_of_week])
 }
 
 model menu_categories {
-  id           Int         @id @default(autoincrement())
+  id            Int         @id @default(autoincrement())
   restaurant_id Int?
-  name         String
-  is_available Boolean     @default(true)
-  created_at   DateTime @default(now())
-  updated_at   DateTime @updatedAt
-  restaurants  restaurants? @relation(fields: [restaurant_id], references: [id])
-  menu_items   menu_items[]
+  name          String
+  is_available  Boolean     @default(true)
+  display_order Int         @default(0)
+  created_at    DateTime    @default(now())
+  updated_at    DateTime    @updatedAt
+  
+  // Relations
+  restaurants   restaurants? @relation(fields: [restaurant_id], references: [id])
+  menu_items    menu_items[]
 }
 
 model menu_items {
-  id           Int            @id @default(autoincrement())
-  restaurant_id Int?
-  category_id  Int?
-  name         String
-  description  String?
-  price        Int
-  is_available Boolean        @default(true)
-  image_url    String?
-  created_at   DateTime @default(now())
-  updated_at   DateTime @updatedAt
-  restaurants  restaurants?   @relation(fields: [restaurant_id], references: [id])
+  id              Int            @id @default(autoincrement())
+  restaurant_id   Int?
+  category_id     Int?
+  name            String
+  description     String?
+  price           Int            // Price in paisa/cents
+  is_available    Boolean        @default(true)
+  is_veg          Boolean        @default(true)
+  image_url       String?
+  preparation_time Int?          // Estimated prep time in minutes
+  customizable    Boolean        @default(false)
+  created_at      DateTime       @default(now())
+  updated_at      DateTime       @updatedAt
+  
+  // Relations
+  restaurants     restaurants?   @relation(fields: [restaurant_id], references: [id])
   menu_categories menu_categories? @relation(fields: [category_id], references: [id])
-  daily_meals  daily_meals[]
-  cart_items   cart_items[]
-  order_items  order_items[]
+  daily_meals     daily_meals[]
+  cart_items      cart_items[]
+  order_items     order_items[]
 }
 
 model daily_meals {
   id           Int      @id @default(autoincrement())
   menu_item_id Int?
   available_on DateTime?
-  meal_type    String?
+  meal_type    String?  // breakfast, lunch, dinner
+  is_featured  Boolean  @default(false) // For carousel
   created_at   DateTime @default(now())
   updated_at   DateTime @updatedAt
+  
+  // Relations
   menu_items   menu_items? @relation(fields: [menu_item_id], references: [id])
 }
 
 model cart_items {
-  id           Int      @id @default(autoincrement())
-  user_id      Int?
-  menu_item_id Int?
-  quantity     Int      @default(1)
-  created_at   DateTime @default(now())
-  updated_at   DateTime @updatedAt
-  users        users?   @relation(fields: [user_id], references: [id])
-  menu_items   menu_items? @relation(fields: [menu_item_id], references: [id])
+  id             Int      @id @default(autoincrement())
+  user_id        Int?
+  menu_item_id   Int?
+  quantity       Int      @default(1)
+  customization  String?  // JSON string for custom requirements
+  created_at     DateTime @default(now())
+  updated_at     DateTime @updatedAt
+  
+  // Relations
+  users          users?   @relation(fields: [user_id], references: [id])
+  menu_items     menu_items? @relation(fields: [menu_item_id], references: [id])
 }
 
 model order_status {
   id     Int     @id @default(autoincrement())
-  status String  @unique
+  status String  @unique // pending, accepted, in_progress, ready, completed, cancelled
   orders orders[]
 }
 
@@ -126,48 +210,135 @@ model address_book {
   address   String?
   latitude  Float?
   longitude Float?
-  created_at   DateTime @default(now())
-  updated_at   DateTime @updatedAt
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+  
+  // Relations
   users     users?   @relation(fields: [user_id], references: [id])
   orders    orders[]
 }
 
 model orders {
-  id                 Int           @id @default(autoincrement())
-  user_id            Int?
-  restaurant_id      Int?
-  order_status_id    Int?
-  order_type         String        @default("takeaway")
-  rejected_reason    String?
-  total_amount       Int
-  delivery_address_id Int?
-  created_at   DateTime @default(now())
-  updated_at   DateTime @updatedAt
-  completed_at       DateTime?
-  users              users?        @relation(fields: [user_id], references: [id])
-  restaurants        restaurants?  @relation(fields: [restaurant_id], references: [id])
-  order_status       order_status? @relation(fields: [order_status_id], references: [id])
-  address_book       address_book? @relation(fields: [delivery_address_id], references: [id])
-  order_items        order_items[]
-  payments           payments[]
+  id                    Int           @id @default(autoincrement())
+  user_id               Int?
+  restaurant_id         Int?
+  order_status_id       Int?
+  order_number          String        @unique @default(cuid())
+  order_type            String        @default("takeaway") // takeaway, dine_in
+  rejected_reason       String?
+  subtotal_amount       Int           // Amount before commission
+  commission_amount     Int           @default(0) // Platform commission
+  loyalty_discount      Int           @default(0) // Loyalty points discount
+  total_amount          Int           // Final amount customer pays
+  restaurant_amount     Int           // Amount restaurant receives (subtotal - commission)
+  delivery_address_id   Int?
+  estimated_time        Int?          // Estimated preparation time in minutes
+  special_instructions  String?
+  can_cancel           Boolean        @default(true) // Based on order status
+  created_at           DateTime       @default(now())
+  updated_at           DateTime       @updatedAt
+  completed_at         DateTime?
+  
+  // Relations
+  users                users?        @relation(fields: [user_id], references: [id])
+  restaurants          restaurants?  @relation(fields: [restaurant_id], references: [id])
+  order_status         order_status? @relation(fields: [order_status_id], references: [id])
+  address_book         address_book? @relation(fields: [delivery_address_id], references: [id])
+  order_items          order_items[]
+  payments             payments[]
 }
 
 model order_items {
-  id           Int      @id @default(autoincrement())
-  order_id     Int?
-  menu_item_id Int?
-  quantity     Int
-  price        Int
-  orders       orders?   @relation(fields: [order_id], references: [id])
-  menu_items   menu_items? @relation(fields: [menu_item_id], references: [id])
+  id             Int      @id @default(autoincrement())
+  order_id       Int?
+  menu_item_id   Int?
+  quantity       Int
+  unit_price     Int      // Price per item at time of order
+  total_price    Int      // quantity * unit_price
+  customization  String?  // JSON string for custom requirements
+  
+  // Relations
+  orders         orders?   @relation(fields: [order_id], references: [id])
+  menu_items     menu_items? @relation(fields: [menu_item_id], references: [id])
 }
 
 model payments {
-  id        Int      @id @default(autoincrement())
-  order_id  Int?
-  amount    Int
-  method    String?
-  status    String?
-  paid_at   DateTime?
-  orders    orders?   @relation(fields: [order_id], references: [id])
+  id             Int      @id @default(autoincrement())
+  order_id       Int?
+  amount         Int      // Total amount paid
+  commission_amount Int   @default(0) // Commission collected
+  method         String?  // razorpay, paytm, cash, etc.
+  transaction_id String?  // Payment gateway transaction ID
+  status         String?  // pending, completed, failed, refunded
+  paid_at        DateTime?
+  created_at     DateTime @default(now())
+  updated_at     DateTime @updatedAt
+  
+  // Relations
+  orders         orders?   @relation(fields: [order_id], references: [id])
+}
+
+// New tables for additional features
+model restaurant_ratings {
+  id            Int         @id @default(autoincrement())
+  user_id       Int
+  restaurant_id Int
+  rating        Int         // 1-5 stars
+  comment       String?
+  order_id      Int?        // Optional: rating for specific order
+  created_at    DateTime    @default(now())
+  
+  // Relations
+  user          users       @relation(fields: [user_id], references: [id])
+  restaurant    restaurants @relation(fields: [restaurant_id], references: [id])
+  
+  @@unique([user_id, restaurant_id]) // One rating per user per restaurant
+}
+
+model loyalty_rates {
+  id                    Int         @id @default(autoincrement())
+  restaurant_id         Int         @unique
+  points_per_rupee      Float       @default(1.0)  // 1 point per rupee
+  min_order_for_points  Int         @default(0)    // Min order to earn points
+  min_redeem_points     Int         @default(50)   // Min points to redeem
+  max_redeem_percent    Int         @default(50)   // Max % of order that can be paid with points
+  
+  // Relations
+  restaurant            restaurants @relation(fields: [restaurant_id], references: [id], onDelete: Cascade)
+}
+
+model loyalty_points {
+  id            Int      @id @default(autoincrement())
+  user_id       Int
+  restaurant_id Int?     // null for system-wide points
+  points        Int      // Positive for earned, negative for redeemed
+  transaction_type String // earned, redeemed, expired
+  order_id      Int?     // Related order if applicable
+  description   String?  // Description of transaction
+  expires_at    DateTime?
+  created_at    DateTime @default(now())
+  
+  // Relations
+  user          users    @relation(fields: [user_id], references: [id])
+}
+
+model offers {
+  id              Int         @id @default(autoincrement())
+  restaurant_id   Int
+  title           String
+  description     String
+  discount_type   String      // percentage, fixed_amount
+  discount_value  Int         // Percentage or amount in paisa
+  min_order_value Int?        // Minimum order value to apply offer
+  max_discount    Int?        // Maximum discount amount
+  valid_from      DateTime
+  valid_to        DateTime
+  is_active       Boolean     @default(true)
+  usage_limit     Int?        // Max number of times this offer can be used
+  usage_count     Int         @default(0)
+  created_at      DateTime    @default(now())
+  updated_at      DateTime    @updatedAt
+  
+  // Relations
+  restaurant      restaurants @relation(fields: [restaurant_id], references: [id], onDelete: Cascade)
 }
