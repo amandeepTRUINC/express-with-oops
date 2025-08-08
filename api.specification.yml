@@ -1,0 +1,865 @@
+openapi: 3.0.3
+info:
+  title: Restaurant Order Booking API
+  description: |
+    A comprehensive API for restaurant order booking and management system.
+    This API supports user management, restaurant operations, menu management, 
+    cart functionality, and order processing with role-based access control.
+    
+    ## Authentication
+    This API uses Bearer token authentication. Include the token in the Authorization header:
+    ```
+    Authorization: Bearer <your-jwt-token>
+    ```
+    
+    ## User Roles
+    - **Customer**: Can browse restaurants, manage cart, place orders
+    - **Restaurant Owner**: Can manage their restaurant, menu, and orders
+    - **Admin**: Full system access, can manage all restaurants and users
+    
+  version: 1.0.0
+  contact:
+    name: API Support
+    email: support@restaurant-booking.com
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+
+servers:
+  - url: http://localhost:8000/api/v1
+    description: Development server
+  # - url: https://api.restaurant-booking.com/api/v1
+  #   description: Production server
+
+security:
+  - bearerAuth: []
+
+paths:
+  # Authentication Endpoints
+  /users/login:
+    post:
+      tags:
+        - Authentication
+      summary: User login
+      description: Authenticate user with email/phone and password
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+            examples:
+              email_login:
+                summary: Login with email
+                value:
+                  identifier: "user@example.com"
+                  password: "password123"
+              phone_login:
+                summary: Login with phone
+                value:
+                  identifier: "9876543210"
+                  password: "password123"
+      responses:
+        '200':
+          description: Login successful
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/LoginResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  # User Management Endpoints
+  /users:
+    get:
+      tags:
+        - User Management
+      summary: Get all users
+      description: Retrieve list of all users (Admin and Restaurant Owner only)
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Users retrieved successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items:
+                          type: array
+                          items:
+                            $ref: '#/components/schemas/User'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+    post:
+      tags:
+        - User Management
+      summary: Create new user
+      description: Register a new user account
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateUserRequest'
+      responses:
+        '201':
+          description: User created successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            id:
+                              type: integer
+                              example: 123
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '409':
+          $ref: '#/components/responses/Conflict'
+
+    put:
+      tags:
+        - User Management
+      summary: Update user profile
+      description: Update authenticated user's profile information
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateUserRequest'
+      responses:
+        '200':
+          description: User updated successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/User'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /users/{id}:
+    get:
+      tags:
+        - User Management
+      summary: Get user details
+      description: Retrieve specific user details
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: User ID
+      responses:
+        '200':
+          description: User details retrieved successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/User'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+    delete:
+      tags:
+        - User Management
+      summary: Delete user
+      description: Delete a user account
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: User ID
+      responses:
+        '200':
+          description: User deleted successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /users/{id}/status/{status}:
+    patch:
+      tags:
+        - User Management
+      summary: Update user role/status
+      description: Update user role or status (Admin only)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: User ID
+        - name: status
+          in: path
+          required: true
+          schema:
+            type: string
+            enum: [customer, restraunt_owner, admin]
+          description: New user role
+      responses:
+        '200':
+          description: User role updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  # Restaurant Management Endpoints
+  /restaurants:
+    get:
+      tags:
+        - Restaurant Management
+      summary: Get all restaurants
+      description: Retrieve list of all restaurants (Admin only)
+      responses:
+        '200':
+          description: Restaurants retrieved successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items:
+                          type: array
+                          items:
+                            $ref: '#/components/schemas/Restaurant'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+    post:
+      tags:
+        - Restaurant Management
+      summary: Create new restaurant
+      description: Register a new restaurant (Admin only)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateRestaurantRequest'
+      responses:
+        '201':
+          description: Restaurant created successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            id:
+                              type: integer
+                              example: 456
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  /restaurants/{id}:
+    get:
+      tags:
+        - Restaurant Management
+      summary: Get restaurant details
+      description: Retrieve specific restaurant details
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: Restaurant ID
+      responses:
+        '200':
+          description: Restaurant details retrieved successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/Restaurant'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+    put:
+      tags:
+        - Restaurant Management
+      summary: Update restaurant
+      description: Update restaurant details (Admin or Restaurant Owner)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: Restaurant ID
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateRestaurantRequest'
+      responses:
+        '200':
+          description: Restaurant updated successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            id:
+                              type: integer
+                              example: 456
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /restaurants/{id}/status/{status}:
+    patch:
+      tags:
+        - Restaurant Management
+      summary: Update restaurant approval status
+      description: Approve or reject restaurant (Admin only)
+      parameters:
+        - name: id
+          in: path
+          required: yes
+          schema:
+            type: integer
+          description: Restaurant ID
+        - name: status
+          in: path
+          required: yes
+          schema:
+            type: string
+            enum: [pending, approved, rejected]
+          description: New approval status
+      responses:
+        '200':
+          description: Restaurant status updated successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            id:
+                              type: integer
+                              example: 456
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: JWT token obtained from login endpoint
+
+  schemas:
+    # Request Schemas
+    LoginRequest:
+      type: object
+      required:
+        - identifier
+        - password
+      properties:
+        identifier:
+          type: string
+          description: Email address or phone number
+          example: "user@example.com"
+        password:
+          type: string
+          format: password
+          description: User password
+          example: "password123"
+
+    CreateUserRequest:
+      type: object
+      required:
+        - full_name
+        - email
+        - phone_number
+        - password
+      properties:
+        full_name:
+          type: string
+          minLength: 3
+          maxLength: 30
+          description: User's full name
+          example: "John Doe"
+        email:
+          type: string
+          format: email
+          description: User's email address
+          example: "john.doe@example.com"
+        phone_number:
+          type: string
+          pattern: '^[789]\d{9}$'
+          description: 10-digit phone number
+          example: "9876543210"
+        password:
+          type: string
+          minLength: 8
+          pattern: '^(?=.*[A-Za-z])(?=.*\d).+$'
+          description: Password with at least one letter and one number
+          example: "password123"
+
+    UpdateUserRequest:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: User ID
+          example: 123
+        full_name:
+          type: string
+          minLength: 3
+          maxLength: 30
+          description: User's full name
+          example: "John Doe"
+        email:
+          type: string
+          format: email
+          description: User's email address
+          example: "john.doe@example.com"
+        phone_number:
+          type: string
+          pattern: '^[789]\d{9}$'
+          description: 10-digit phone number
+          example: "9876543210"
+
+    CreateRestaurantRequest:
+      type: object
+      required:
+        - name
+        - address
+        - contact_number
+        - owner_id
+        - is_active
+        - approval_status
+        - commission_rate
+      properties:
+        name:
+          type: string
+          minLength: 3
+          maxLength: 100
+          description: Restaurant name
+          example: "Delicious Bites"
+        address:
+          type: string
+          minLength: 5
+          maxLength: 255
+          description: Restaurant address
+          example: "123 Food Street, City Center"
+        contact_number:
+          type: string
+          pattern: '^[789]\d{9}$'
+          description: 10-digit contact number
+          example: "9876543210"
+        owner_id:
+          type: integer
+          description: ID of the restaurant owner
+          example: 123
+        is_active:
+          type: boolean
+          description: Whether restaurant is active
+          example: true
+        approval_status:
+          type: string
+          enum: [pending, approved, rejected]
+          description: Restaurant approval status
+          example: "pending"
+        commission_rate:
+          type: number
+          minimum: 0
+          maximum: 100
+          description: Commission rate percentage
+          example: 15.5
+
+    UpdateRestaurantRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          minLength: 3
+          maxLength: 100
+          description: Restaurant name
+          example: "Delicious Bites"
+        address:
+          type: string
+          minLength: 5
+          maxLength: 255
+          description: Restaurant address
+          example: "123 Food Street, City Center"
+        contact_number:
+          type: string
+          pattern: '^[789]\d{9}$'
+          description: 10-digit contact number
+          example: "9876543210"
+        owner_id:
+          type: integer
+          description: ID of the restaurant owner
+          example: 123
+        is_active:
+          type: boolean
+          description: Whether restaurant is active
+          example: true
+        commission_rate:
+          type: number
+          minimum: 0
+          maximum: 100
+          description: Commission rate percentage
+          example: 15.5
+
+    # Response Schemas
+    ApiResponse:
+      type: object
+      properties:
+        message:
+          type: string
+          description: Response message
+          example: "Success"
+        status:
+          type: integer
+          description: HTTP status code
+          example: 200
+        data:
+          type: array
+          description: Response data array
+          items: {}
+        error:
+          nullable: true
+          description: Error details if any
+          example: null
+
+    LoginResponse:
+      type: object
+      properties:
+        token:
+          type: string
+          description: JWT authentication token
+          example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+        user_id:
+          type: integer
+          description: user id of the user
+          example: 123
+
+    User:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: User ID
+          example: 123
+        full_name:
+          type: string
+          description: User's full name
+          example: "John Doe"
+        email:
+          type: string
+          format: email
+          description: User's email address
+          example: "john.doe@example.com"
+        phone_number:
+          type: string
+          description: User's phone number
+          example: "9876543210"
+        role_id:
+          type: integer
+          description: User's role ID
+          example: 1
+        status:
+          type: boolean
+          description: User account status
+          example: true
+        created_at:
+          type: string
+          format: date-time
+          description: Account creation timestamp
+          example: "2024-01-15T10:30:00Z"
+        updated_at:
+          type: string
+          format: date-time
+          description: Last update timestamp
+          example: "2024-01-15T10:30:00Z"
+        roles:
+          type: object
+          properties:
+            name:
+              type: string
+              enum: [customer, restraunt_owner, admin]
+              description: Role name
+              example: "customer"
+
+    Restaurant:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: Restaurant ID
+          example: 456
+        name:
+          type: string
+          description: Restaurant name
+          example: "Delicious Bites"
+        address:
+          type: string
+          description: Restaurant address
+          example: "123 Food Street, City Center"
+        contact_number:
+          type: string
+          description: Restaurant contact number
+          example: "9876543210"
+        owner_id:
+          type: integer
+          description: Owner user ID
+          example: 123
+        is_active:
+          type: boolean
+          description: Whether restaurant is active
+          example: true
+        approval_status:
+          type: string
+          enum: [pending, approved, rejected]
+          description: Restaurant approval status
+          example: "approved"
+        commission_rate:
+          type: number
+          description: Commission rate percentage
+          example: 15.5
+        estimated_prep_time:
+          type: integer
+          description: Estimated preparation time in minutes
+          example: 30
+        created_at:
+          type: string
+          format: date-time
+          description: Restaurant creation timestamp
+          example: "2024-01-15T10:30:00Z"
+        updated_at:
+          type: string
+          format: date-time
+          description: Last update timestamp
+          example: "2024-01-15T10:30:00Z"
+        users:
+          $ref: '#/components/schemas/User'
+
+    Error:
+      type: object
+      properties:
+        message:
+          type: string
+          description: Error message
+          example: "Invalid request"
+        status:
+          type: integer
+          description: HTTP status code
+          example: 400
+        data:
+          type: array
+          items: {}
+          description: Empty data array
+          example: []
+        error:
+          type: object
+          description: Detailed error information
+
+  responses:
+    BadRequest:
+      description: Bad request - Invalid input data
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: '#/components/schemas/Error'
+              - type: object
+                properties:
+                  message:
+                    example: "Invalid Request"
+                  status:
+                    example: 400
+
+    Unauthorized:
+      description: Unauthorized - Invalid or missing authentication token
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: '#/components/schemas/Error'
+              - type: object
+                properties:
+                  message:
+                    example: "Unauthorized Access"
+                  status:
+                    example: 401
+
+    Forbidden:
+      description: Forbidden - Insufficient permissions
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: '#/components/schemas/Error'
+              - type: object
+                properties:
+                  message:
+                    example: "Forbidden Resource"
+                  status:
+                    example: 403
+
+    NotFound:
+      description: Not found - Resource does not exist
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: '#/components/schemas/Error'
+              - type: object
+                properties:
+                  message:
+                    example: "Not Found"
+                  status:
+                    example: 404
+
+    Conflict:
+      description: Conflict - Resource already exists
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: '#/components/schemas/Error'
+              - type: object
+                properties:
+                  message:
+                    example: "Resource already exists"
+                  status:
+                    example: 409
+
+    InternalServerError:
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: '#/components/schemas/Error'
+              - type: object
+                properties:
+                  message:
+                    example: "Internal Server Error"
+                  status:
+                    example: 500
+
+tags:
+  - name: Authentication
+    description: User authentication and authorization
+  - name: User Management
+    description: User account management operations
+  - name: Restaurant Management
+    description: Restaurant CRUD operations and approval workflow
+
+externalDocs:
+  description: Find more info about the Restaurant Order Booking API
+  url: https://docs.restaurant-booking.com
