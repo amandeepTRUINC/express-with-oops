@@ -18,7 +18,7 @@ export const loginUser = async (body: LoginRequst) => {
 
     if (!user) {
       throw new CustomError({
-        message: HTTP_STATUS_MESSAGES.NOTE_FOUND,
+        message: HTTP_STATUS_MESSAGES.NOT_FOUND,
         status: HTTP_STATUS_CODES.NOT_FOUND
       })
     }

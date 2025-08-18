@@ -124,23 +124,24 @@ async function updateUserRole (userId: number, role: string): Promise<void | ICu
   }
 }
 
-async function searchUser (searchParam: string): Promise<IUser | ICustomError> {
+async function searchUser(searchParam: string): Promise<IUser | ICustomError> {
   try {
     const userDetails = await userRepository.fetchSingleUser({
       where: isEmail(searchParam)
-        ? { email: searchParam }
-        : { full_name: searchParam },
+        ? { email: { contains: searchParam, mode: "insensitive" } }
+        : { full_name: { contains: searchParam, mode: "insensitive" } },
     });
 
     if (!userDetails) {
       throw new CustomError({
-        message: HTTP_STATUS_MESSAGES.NOTE_FOUND,
-        status: HTTP_STATUS_CODES.NOT_FOUND
-      })
+        message: HTTP_STATUS_MESSAGES.NOT_FOUND,
+        status: HTTP_STATUS_CODES.NOT_FOUND,
+      });
     }
-    return userDetails
+
+    return userDetails;
   } catch (error) {
-    return handleError(error)
+    return handleError(error);
   }
 }
 export const userService = {

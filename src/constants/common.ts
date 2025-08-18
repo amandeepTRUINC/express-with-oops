@@ -15,7 +15,7 @@ export const HTTP_STATUS_MESSAGES = {
   FORM_ERROR: 'Invalid Request',
   UN_AUTHORIZED: 'Unauthorized Access',
   FORBIDDEN_RESOURCE: 'Forbidden Resource',
-  NOTE_FOUND: 'Not Found',
+  NOT_FOUND: 'Not Found',
   INTERNAL_SERVER_ERROR: 'Internal Server Error',
   INVALID_CREDENTIALS: 'Invalid Credentials'
 }
