@@ -1,7 +1,7 @@
 import { Router } from 'express';
 
-import { validateCreateUserReq, validateLoginUserReq, validateUpdateUserReq, validateUpdateUserStatusReq, validateUserIdInReq } from '../validations/index';
-import { handleGetAllUsers, handleGetUserDetails, handleCreateUser, handleUpdateUser, handleDeleteUser, handleUpdateUserRole } from '../controller/user.controllers';
+import { validateCreateUserReq, validateLoginUserReq, validateSearchUserReq, validateUpdateUserReq, validateUpdateUserStatusReq, validateUserIdInReq } from '../validations/index';
+import { handleGetAllUsers, handleGetUserDetails, handleCreateUser, handleUpdateUser, handleDeleteUser, handleUpdateUserRole, handleSearchUser } from '../controller/user.controllers';
 import { handleLoginReq } from '../controller/auth.controller';
 import { authGuard } from '../guards/auth.guard';
 import { roleGuard } from '../guards/role.guard';
@@ -11,7 +11,7 @@ const router = Router();
 
 router.get('/',
   authGuard,
-  roleGuard([roles_enum.ADMIN, roles_enum.RESTRAUNT_OWNER]),
+  roleGuard([roles_enum.ADMIN, roles_enum.RESTAURANT_OWNER]),
   handleGetAllUsers
 )
 
@@ -48,6 +48,14 @@ router.patch('/:id/status/:status',
   roleGuard([roles_enum.ADMIN]),
   validateUpdateUserStatusReq,
   handleUpdateUserRole
+)
+
+router.get(
+  '/search/:param',
+  authGuard,
+  validateSearchUserReq,
+  roleGuard([roles_enum.ADMIN, roles_enum.RESTAURANT_OWNER]),
+  handleSearchUser
 )
 
 export default router;

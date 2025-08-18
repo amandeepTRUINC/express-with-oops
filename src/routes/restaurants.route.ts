@@ -10,8 +10,8 @@ const router = Router()
 router.post(
   '/',
   validateCreateRestaurantReq,
-  authGuard,
-  roleGuard([roles_enum.ADMIN]),
+  // authGuard,
+  // roleGuard([roles_enum.ADMIN]),
   handleCreateRestaurantReq
 )
 
@@ -32,7 +32,7 @@ router.put(
   '/:id',
   validateUpdateRestaurantReq,
   authGuard,
-  roleGuard([roles_enum.ADMIN, roles_enum.RESTRAUNT_OWNER]),
+  roleGuard([roles_enum.ADMIN, roles_enum.RESTAURANT_OWNER]),
   handleUpdatedRestaurantReq
 )
 

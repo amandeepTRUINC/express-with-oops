@@ -10,12 +10,13 @@ export const createRestaurantValidationsSchema = Joi.object({
     .messages({
       'string.pattern.base': 'Contact number must be a 10-digit number.',
     }),
-  owner_id: Joi.number().integer().positive().required(),
-  is_active: Joi.boolean().required(),
-  approval_status: Joi.string()
-    .valid(...Object.values(enum_restaurant_approval_status))
-    .required(),
-  commission_rate: Joi.number().min(0).max(100).required(),
+  commission_rate: Joi.number().optional(),
+  estimated_prep_time: Joi.number().optional(),
+  owner_info: Joi.object({
+    full_name: Joi.string().required().min(3).max(30),
+    email: Joi.string().required().email(),
+    phone_number: Joi.string().required().length(10).pattern(/^(	1[\-\s]?)?[0]?(91)?[789]\d{9}$/),
+  })
 })
 
 export const updateRestaurantValidationsSchema = Joi.object({

@@ -1,6 +1,5 @@
 import { Prisma } from "@prisma/client";
 import { HTTP_STATUS_CODES } from "../constants/common";
-import { prisma } from "../db/dbConnection";
 import { ICustomError } from "../interfaces/common.interface";
 import { enum_restaurant_approval_status, IRestaurant } from "../interfaces/restaurants.interface";
 import { roles_enum } from "../interfaces/roles.interface";
@@ -17,22 +16,30 @@ export const createRestaurant = async (
   requestBody: Partial<IRestaurant>
 ): Promise<number | ICustomError> => {
   try {
-    const roleDetails = await getRoleDetails(roles_enum.RESTRAUNT_OWNER)
+    const roleDetails = await getRoleDetails(roles_enum.RESTAURANT_OWNER)
+    let ownerId: number;
     // checking if restaurant_owner exist or not
-    const ownerExistence = await userService.getUserDetails({ id: requestBody.owner_id, role_id: roleDetails.id })
+    let ownerExistence = await userService.getUserDetails({ email: requestBody.owner_info?.email, role_id: roleDetails.id, phone_number: requestBody.owner_info?.phone_number })
     if (!ownerExistence) {
-      throw new CustomError({
-        message: 'Owner Details not Found',
-        status: HTTP_STATUS_CODES.NOT_FOUND
-      })
+      // it means we have to create a owner first and then associate the owner with restaurant
+      const ownerDetails = {
+        ...requestBody.owner_info,
+        password: process.env.DEFAULT_OWNER_PASSWORD as string,
+        role_id: roleDetails.id
+      }
+      ownerId = await userService.createUser(ownerDetails) as number
+
+    } else {
+      ownerId = (ownerExistence as IUser).id
     }
+
     // duplicacy check in case same owner is trying to register duplicate restaurant. // TODO- NEED TO CHECK IN FUTURE IN CASE ONE OWNER WANT TO OPEN THE SAME RESTAURANT AT DIFFERENT LOCATION (FOR EXAMPLE - IN MOHALI 67, 74, 75, 82 AND SO ON.). SO IN THIS CASE WE HAVE TO VERIFY WITH THE ADDRESS AS WELL
 
     const restaurant_existence = await restaurantRepository.fetchSingleRestaurant({
       where: {
         name: requestBody.name,
         contact_number: requestBody.contact_number,
-        owner_id: (ownerExistence as IUser).id
+        owner_id: ownerId
       }
     })
     if (restaurant_existence) {
@@ -45,7 +52,7 @@ export const createRestaurant = async (
       name: requestBody.name,
       address: requestBody.address,
       contact_number: requestBody.contact_number,
-      owner_id: (ownerExistence as IUser).id,
+      owner_id: ownerId,
       approval_status: enum_restaurant_approval_status.PENDING
     }
     const createdId = await restaurantRepository.createRestaurant(restaurantDetails as Prisma.restaurantsCreateArgs['data']).catch((error) => {
@@ -59,7 +66,9 @@ export const createRestaurant = async (
 
 export const getRestaurantList = async (): Promise<IRestaurant[] | ICustomError> => {
   try {
-    const restaurantList = await restaurantRepository.fetchMultipleRestaurants({})
+    const restaurantList = await restaurantRepository.fetchMultipleRestaurants({select: {
+      ...restaurantPubliFields
+    }})
     return restaurantList
   } catch (error) {
     return handleError(error)
@@ -82,9 +91,9 @@ export const getRestaurantDetails = async (restaurantId: number): Promise<IResta
   }
 }
 
-export const updateRestaurantDetails = async (requestBody: Partial<IRestaurant>): Promise<number | ICustomError> => {
+export const updateRestaurantDetails = async (requestBody: Partial<IRestaurant> & { owner_id: number }): Promise<number | ICustomError> => {
   try {
-    const roleDetails = await getRoleDetails(roles_enum.RESTRAUNT_OWNER)
+    const roleDetails = await getRoleDetails(roles_enum.RESTAURANT_OWNER)
     // checking if restaurant_owner exist or not
     const ownerExistence = await userService.getUserDetails({ id: requestBody.owner_id, role_id: roleDetails.id })
     if (!ownerExistence) {
@@ -135,7 +144,7 @@ export const updaterestaurantStatus = async (id: number, status: string): Promis
       })
     }
     await restaurantRepository.updateSingleRestaurant({ id }, { approval_status: status })
-    return 
+    return
   } catch (error) {
     return handleError(error)
   }

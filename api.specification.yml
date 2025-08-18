@@ -248,7 +248,7 @@ paths:
           required: true
           schema:
             type: string
-            enum: [customer, restraunt_owner, admin]
+            enum: [customer, restaurant_owner, admin]
           description: New user role
       responses:
         '200':
@@ -690,7 +690,7 @@ components:
           properties:
             name:
               type: string
-              enum: [customer, restraunt_owner, admin]
+              enum: [customer, restaurant_owner, admin]
               description: Role name
               example: "customer"
 

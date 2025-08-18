@@ -25,7 +25,7 @@ export async function handleDeleteUser (req: AuthenticatedRequest, res: Response
   }
 }
 
-// TODO - Need to add a check where admin can view all the users but 'RESTRAUNT_OWNER' can only view its corresponding users
+// TODO - Need to add a check where admin can view all the users but 'RESTAURANT_OWNER' can only view its corresponding users
 export async function handleGetAllUsers (req: AuthenticatedRequest, res: Response): Promise<Response> {
   try {
     const userDetails = await userService.getAllUser().catch((error) => {
@@ -74,6 +74,18 @@ export async function handleUpdateUserRole (req: AuthenticatedRequest, res: Resp
     const role = req.params.status
     await userService.updateUserRole(userId, role)
     return handleSuccessResponse({ res })
+  } catch (error) {
+    return handleErrorResponse(res, error)
+  }
+}
+
+export async function handleSearchUser (req: AuthenticatedRequest, res: Response): Promise<Response> {
+  try {
+    const searchParam = req.params.param
+    const userDetails = await userService.searchUser(searchParam).catch(error => {
+      throw error
+    })
+    return handleSuccessResponse({ res, data: [userDetails]})
   } catch (error) {
     return handleErrorResponse(res, error)
   }

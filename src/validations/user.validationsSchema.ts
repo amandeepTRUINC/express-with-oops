@@ -47,3 +47,22 @@ export const validateUpdateStatusSchema = Joi.object({
     .valid(...Object.values(roles_enum))
     .required()
 });
+
+
+export const validateSearchUserSchema = Joi.object({
+  param: Joi.string()
+    .trim()
+    .required()
+    .custom((value, helpers) => {
+      const isEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
+      const isName = /^[a-zA-Z\s]+$/.test(value); // letters + spaces only
+
+      if (!isEmail && !isName) {
+        return helpers.error("any.invalid", {
+          message:
+            "Identifier must be a valid email or name",
+        });
+      }
+      return value;
+    }),
+});

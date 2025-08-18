@@ -2,6 +2,7 @@ import express from 'express';
 import dotenv from 'dotenv';
 import RegisterRoutes from '../routes';
 import { seedDefaultRoles } from '../seeding/roles';
+import { seedDefaultUsers } from '../seeding/users';
 
 dotenv.config();
 
@@ -19,6 +20,7 @@ const addDefaultDataAndStartServer = async () => {
     'jwt': process.env.JWT_SECRET
   })
   await seedDefaultRoles()
+  await seedDefaultUsers()
   console.log("#### Default Data Added Successfully ####")
   app.listen(APP_PORT, () => {
     console.log(`Server is running at http://localhost:${APP_PORT}`);

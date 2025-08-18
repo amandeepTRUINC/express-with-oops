@@ -1,9 +1,6 @@
-// src/seeds/seedRoles.ts
-import { PrismaClient } from '@prisma/client';
 import rolesRepository from '../repositories/roles.repository';
 import { roles_enum } from '../interfaces/roles.interface';
-
-const prisma = new PrismaClient();
+import { prisma } from '../db/dbConnection';
 
 // FIX 1: Convert enum to array of role names (just values, not entries)
 const defaultRoles = Object.values(roles_enum); // Now it's: ['ADMIN', 'CUSTOMER', ...] — all strings

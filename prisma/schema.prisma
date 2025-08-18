@@ -96,7 +96,7 @@ model restaurants {
   updated_at            DateTime      @updatedAt
   
   // Relations
-  users                 users?        @relation("OwnerRestaurants", fields: [owner_id], references: [id])
+  owner                 users?        @relation("OwnerRestaurants", fields: [owner_id], references: [id])
   menu_categories       menu_categories[]
   menu_items            menu_items[]
   orders                orders[]

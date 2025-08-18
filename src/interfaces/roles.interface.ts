@@ -6,6 +6,6 @@ export interface IRoles {
 
 export enum roles_enum {
   CUSTOMER = 'customer',
-  RESTRAUNT_OWNER = 'restraunt_owner',
+  RESTAURANT_OWNER = 'restaurant_owner',
   ADMIN = 'admin'
 }

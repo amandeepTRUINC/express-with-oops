@@ -8,7 +8,8 @@ import {
   updateUserValidationsSchema, 
   validateUserIdSchema, 
   validateLoginUserReqSchema, 
-  validateUpdateStatusSchema
+  validateUpdateStatusSchema,
+  validateSearchUserSchema
 } from './user.validationsSchema'
 import { HTTP_STATUS_CODES, HTTP_STATUS_MESSAGES } from '../constants/common';
 import { createRestaurantValidationsSchema, updateRestaurantStatusSchema, updateRestaurantValidationsSchema } from './restaurant.validationsSchema';
@@ -72,7 +73,7 @@ export const validateUpdateUserReq = getRequestErrors(updateUserValidationsSchem
 export const validateUserIdInReq = getRequestErrors(validateUserIdSchema)
 export const validateLoginUserReq = getRequestErrors(validateLoginUserReqSchema)
 export const validateUpdateUserStatusReq = getRequestErrors(validateUpdateStatusSchema)
-
+export const validateSearchUserReq = getRequestErrors(validateSearchUserSchema)
 
 export const validateCreateRestaurantReq = getRequestErrors(createRestaurantValidationsSchema)
 export const validateUpdateRestaurantReq = getRequestErrors(updateRestaurantValidationsSchema)

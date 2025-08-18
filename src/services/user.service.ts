@@ -2,20 +2,20 @@ import { Prisma } from "@prisma/client";
 import { ICustomError } from "../interfaces/common.interface";
 import { IUser } from "../interfaces/user.interface";
 import { userRepository } from "../repositories/user.repository";
-import { hashPassword, handleError } from "../utils/helperFunctions";
+import { hashPassword, handleError, isEmail } from "../utils/helperFunctions";
 import { userPublicFields } from "../db/commonSelectQueries";
 import { CustomError } from "../utils/error";
 import { getDefaultRole, getRoleDetails } from "./roles.service";
-import { HTTP_STATUS_CODES } from "../constants/common";
+import { HTTP_STATUS_CODES, HTTP_STATUS_MESSAGES } from "../constants/common";
 
-export async function createUser (requestBody: Partial<IUser>): Promise<number | ICustomError> {
+async function createUser (requestBody: Partial<IUser>): Promise<number | ICustomError> {
   try {
     const defaultRole = await getDefaultRole().catch((error: any) => { throw error });
     const { full_name, email, phone_number, password } = requestBody;
     const userExistence = await getUserDetails({ email, phone_number });
     if (userExistence) {
       throw new CustomError({
-        message: "User will same Email and Mobile Number",
+        message: "User with same Email and Mobile Number Already Exists",
         status: HTTP_STATUS_CODES.ENTITY_ALREADY_EXISTS
       });
     }
@@ -34,7 +34,7 @@ export async function createUser (requestBody: Partial<IUser>): Promise<number |
   }
 }
 
-export async function getUserDetails (whereCondition: object): Promise<IUser | ICustomError> {
+async function getUserDetails (whereCondition: object): Promise<IUser | ICustomError> {
   try {
     const userDetails = await userRepository.fetchSingleUser({
       where: { ...whereCondition },
@@ -46,7 +46,7 @@ export async function getUserDetails (whereCondition: object): Promise<IUser | I
   }
 }
 
-export async function getAllUser (): Promise<IUser[] | ICustomError> {
+async function getAllUser (): Promise<IUser[] | ICustomError> {
   try {
     return userRepository.fetchMultipleUsers({
       select: userPublicFields
@@ -56,7 +56,7 @@ export async function getAllUser (): Promise<IUser[] | ICustomError> {
   }
 }
 
-export async function updateUser (whereCondtion: object, updatedData: IUser): Promise<IUser | ICustomError> {
+async function updateUser (whereCondtion: object, updatedData: IUser): Promise<IUser | ICustomError> {
   try {
     let existingUserDetails = await userRepository.fetchSingleUser({
       where: { ...whereCondtion }
@@ -87,7 +87,7 @@ export async function updateUser (whereCondtion: object, updatedData: IUser): Pr
   }
 }
 
-export async function deleteUser (whereCondtion: object): Promise<void | ICustomError> {
+async function deleteUser (whereCondtion: object): Promise<void | ICustomError> {
   try {
     return await userRepository.deleteUsers({
       where: { ...whereCondtion }
@@ -97,7 +97,7 @@ export async function deleteUser (whereCondtion: object): Promise<void | ICustom
   }
 }
 
-export async function updateUserRole (userId: number, role: string): Promise<void | ICustomError> {
+async function updateUserRole (userId: number, role: string): Promise<void | ICustomError> {
   try {
     const userDetails = await userRepository.fetchSingleUser({
       where: { id: userId }
@@ -124,11 +124,31 @@ export async function updateUserRole (userId: number, role: string): Promise<voi
   }
 }
 
+async function searchUser (searchParam: string): Promise<IUser | ICustomError> {
+  try {
+    const userDetails = await userRepository.fetchSingleUser({
+      where: isEmail(searchParam)
+        ? { email: searchParam }
+        : { full_name: searchParam },
+    });
+
+    if (!userDetails) {
+      throw new CustomError({
+        message: HTTP_STATUS_MESSAGES.NOTE_FOUND,
+        status: HTTP_STATUS_CODES.NOT_FOUND
+      })
+    }
+    return userDetails
+  } catch (error) {
+    return handleError(error)
+  }
+}
 export const userService = {
   createUser,
   getUserDetails,
   getAllUser,
   updateUser,
   deleteUser,
-  updateUserRole
+  updateUserRole,
+  searchUser
 };
