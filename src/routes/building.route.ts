@@ -1,7 +1,7 @@
 import { Router } from 'express'
 import { authGuard } from '../guards/auth.guard'
-import { handleCreateBuildingReq, handleDeleteBuildingReq, handleGetBuildingDetailsReq, handleGetBuildingListReq, handleUpdateBuildingDetailsReq } from '../controller/building.controller'
-import { validateBuildingIdReq, validateCreateBuildingReq, validateUpdateBuildingReq } from '../validations'
+import { handlebuildingDeAllocationReq, handleBuilingAllocationReq, handleCreateBuildingReq, handleDeleteBuildingReq, handleGetBuildingDetailsReq, handleGetBuildingListReq, handleUpdateBuildingDetailsReq } from '../controller/building.controller'
+import { validateAllocateBuildingReq, validateBuildingIdReq, validateCreateBuildingReq, validateDeAllocateBuildingReq, validateUpdateBuildingReq } from '../validations'
 import { roleGuard } from '../guards/role.guard'
 import { roles_enum } from '../interfaces/roles.interface'
 
@@ -42,6 +42,20 @@ router.delete(
   roleGuard([roles_enum.ADMIN]),
   validateBuildingIdReq,
   handleDeleteBuildingReq
+)
+
+router.post(
+  '/allocate',
+  authGuard,
+  validateAllocateBuildingReq,
+  handleBuilingAllocationReq
+)
+
+router.post(
+  '/de-allocate',
+  authGuard,
+  validateDeAllocateBuildingReq,
+  handlebuildingDeAllocationReq
 )
 
 export default router

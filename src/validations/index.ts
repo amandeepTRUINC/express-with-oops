@@ -13,7 +13,7 @@ import {
 } from './users/user.validationsSchema'
 import { HTTP_STATUS_CODES, HTTP_STATUS_MESSAGES } from '../constants/common';
 import { createRestaurantValidationsSchema, updateRestaurantStatusSchema, updateRestaurantValidationsSchema } from './restaurant/restaurant.validationsSchema';
-import { createBuildingSchema, updateBuildingSchema, validateBuildingIdSchema } from './buildings/building.validationsSchema';
+import { createBuildingSchema, updateBuildingSchema, validateBuildingIdSchema, allocateBuildingSchema, deAllocateBuildingSchema } from './buildings/building.validationsSchema';
 export const getRequestErrors = (schema: Joi.Schema) => {
   return (
     req: Request<any, any, any, any> | AuthenticatedRequest,
@@ -84,3 +84,5 @@ export const validateUpdateRestaurantStatusReq = getRequestErrors(updateRestaura
 export const validateCreateBuildingReq = getRequestErrors(createBuildingSchema)
 export const validateBuildingIdReq = getRequestErrors(validateBuildingIdSchema)
 export const validateUpdateBuildingReq = getRequestErrors(updateBuildingSchema)
+export const validateAllocateBuildingReq = getRequestErrors(allocateBuildingSchema)
+export const validateDeAllocateBuildingReq = getRequestErrors(deAllocateBuildingSchema)

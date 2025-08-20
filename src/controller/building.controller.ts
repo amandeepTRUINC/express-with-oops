@@ -8,7 +8,7 @@ import { CustomError } from "../utils/error";
 export const handleCreateBuildingReq = async (req: AuthenticatedRequest, res: Response): Promise<Response> => {
   try {
     const buildingId = await buildingService.createBuilding(req.body)
-    return handleSuccessResponse({ res, data: [buildingId], status: HTTP_STATUS_CODES.CREATED})
+    return handleSuccessResponse({ res, data: [{ id: buildingId }], status: HTTP_STATUS_CODES.CREATED})
   } catch (error) {
     return handleErrorResponse(res, error)
   }
@@ -54,6 +54,24 @@ export const handleDeleteBuildingReq = async (req: AuthenticatedRequest, res: Re
     const buildingId = parseInt(req.params.id as string)
 
     await buildingService.deleteBuilding(buildingId)
+    return handleSuccessResponse({ res })
+  } catch (error) {
+    return handleErrorResponse(res, error)
+  }
+}
+
+export const handleBuilingAllocationReq = async (req: AuthenticatedRequest, res: Response): Promise<Response> => {
+  try {
+    const allocationId = await buildingService.associateBuildingWithRestaurant(req.body)
+    return handleSuccessResponse({ res, data: [{ id: allocationId }], status: HTTP_STATUS_CODES.CREATED})
+  } catch (error) {
+    return handleErrorResponse(res, error)
+  }
+}
+
+export const handlebuildingDeAllocationReq = async (req: AuthenticatedRequest, res: Response): Promise<Response> => {
+  try {
+    await buildingService.deLocateBuidlingWithRestaurant(req.body)
     return handleSuccessResponse({ res })
   } catch (error) {
     return handleErrorResponse(res, error)

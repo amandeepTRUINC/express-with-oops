@@ -94,8 +94,3 @@ export const seedDefaultUsers = async () => {
     await prisma.$disconnect();
   }
 };
-
-// Allow running this file directly
-if (require.main === module) {
-  seedDefaultUsers();
-}

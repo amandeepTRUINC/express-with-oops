@@ -21,3 +21,14 @@ export const updateBuildingSchema = Joi.object({
   longitude: Joi.number().optional(),
   restaurant_id: Joi.number().required()
 })
+
+export const allocateBuildingSchema = Joi.object({
+  building_id: Joi.number().required().greater(0).message("Invalid Building Id"),
+  restaurant_id: Joi.number().required().greater(0).message("Invalid Restaurant Id")
+})
+
+export const deAllocateBuildingSchema = Joi.object({
+  id: Joi.number().required().greater(0).message("Invalid Id"),
+  building_id: Joi.number().required().greater(0).message("Invalid Building Id"),
+  restaurant_id: Joi.number().required().greater(0).message("Invalid Restaurant Id")
+})

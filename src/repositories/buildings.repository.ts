@@ -1,6 +1,6 @@
 import { Prisma } from "@prisma/client";
 import { prisma } from "../db/dbConnection";
-import { IBuilding } from "../interfaces/building.interface";
+import { IBuilding, IBuildingRestaurantPayload } from "../interfaces/building.interface";
 
 const createBuilding = async (buildingDetails: Prisma.buildingsCreateArgs['data']): Promise<number> => {
   try {
@@ -68,6 +68,63 @@ const deletebuildings = async (whereCondition: Prisma.buildingsDeleteArgs): Prom
   }
 };
 
+const createBuildingRestaurantAssociatation = async (data: Prisma.restaurant_buildingsCreateArgs['data']): Promise<number> => {
+  try {
+    const result = await prisma.restaurant_buildings.create({
+      data
+    })
+    return result.id
+  } catch (error) {
+    throw error
+  }
+}
+
+const fetchSingleBuildingRestaurantAssociatation = async (whereCondition: Prisma.restaurant_buildingsFindFirstArgs): Promise<IBuildingRestaurantPayload> => {
+  try {
+    const details = await prisma.restaurant_buildings.findFirst(whereCondition)
+    return details as IBuildingRestaurantPayload
+  } catch (error) {
+    throw error
+  }
+}
+
+const fetchMultipleBuildingRestaurantAssociatation = async (whereCondition: Prisma.restaurant_buildingsWhereInput): Promise<IBuildingRestaurantPayload[]> => {
+  try {
+    const list = await prisma.restaurant_buildings.findMany({
+      where: {
+        ...whereCondition
+      }
+    })
+    return list
+  } catch (error) {
+    throw error
+  }
+}
+
+const updateSingleBuildingRestaurantAssociatation = async (whereCondition: Prisma.restaurant_buildingsWhereUniqueInput,
+  updatedData: Prisma.buildingsUpdateArgs['data']): Promise<number> => {
+  try {
+    const details = await prisma.restaurant_buildings.update({
+      where: whereCondition,
+      data: updatedData
+    })
+    return details.id
+  } catch (error) {
+    throw error
+  }
+}
+
+const deleteSingleBuildingRestaurantAssociatation = async (whereCondition: Prisma.restaurant_buildingsWhereUniqueInput): Promise<void> => {
+  try {
+    await prisma.restaurant_buildings.delete({
+      where: whereCondition
+    })
+  } catch (error) {
+    throw error
+  }
+}
+
+
 export const buildingRepository = {
   createBuilding,
   fetchMultiplebuildings,
@@ -75,4 +132,9 @@ export const buildingRepository = {
   updateMultiplebuildings,
   updateSingleBuilding,
   deletebuildings,
+  createBuildingRestaurantAssociatation,
+  fetchSingleBuildingRestaurantAssociatation,
+  fetchMultipleBuildingRestaurantAssociatation,
+  updateSingleBuildingRestaurantAssociatation,
+  deleteSingleBuildingRestaurantAssociatation
 };
