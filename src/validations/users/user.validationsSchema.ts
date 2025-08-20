@@ -1,5 +1,5 @@
 import Joi from "joi";
-import { roles_enum } from "../interfaces/roles.interface";
+import { roles_enum } from "../../interfaces/roles.interface";
 
 export const validateUserIdSchema = Joi.object({
   id: Joi.number().required().integer()

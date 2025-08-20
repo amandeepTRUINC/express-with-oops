@@ -13,12 +13,7 @@ app.use(express.json());
 RegisterRoutes(app);
 
 const addDefaultDataAndStartServer = async () => {
-  console.log("###### ADDING DEFAULT DATA #####",{
-    'db': process.env.DATABASE_URL,
-    'port': process.env.APP_PORT,
-    'salt': process.env.SALT_ROUNDS,
-    'jwt': process.env.JWT_SECRET
-  })
+  console.log("###### ADDING DEFAULT DATA #####")
   await seedDefaultRoles()
   await seedDefaultUsers()
   console.log("#### Default Data Added Successfully ####")

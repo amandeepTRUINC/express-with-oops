@@ -10,9 +10,10 @@ import {
   validateLoginUserReqSchema, 
   validateUpdateStatusSchema,
   validateSearchUserSchema
-} from './user.validationsSchema'
+} from './users/user.validationsSchema'
 import { HTTP_STATUS_CODES, HTTP_STATUS_MESSAGES } from '../constants/common';
-import { createRestaurantValidationsSchema, updateRestaurantStatusSchema, updateRestaurantValidationsSchema } from './restaurant.validationsSchema';
+import { createRestaurantValidationsSchema, updateRestaurantStatusSchema, updateRestaurantValidationsSchema } from './restaurant/restaurant.validationsSchema';
+import { createBuildingSchema, updateBuildingSchema, validateBuildingIdSchema } from './buildings/building.validationsSchema';
 export const getRequestErrors = (schema: Joi.Schema) => {
   return (
     req: Request<any, any, any, any> | AuthenticatedRequest,
@@ -78,3 +79,8 @@ export const validateSearchUserReq = getRequestErrors(validateSearchUserSchema)
 export const validateCreateRestaurantReq = getRequestErrors(createRestaurantValidationsSchema)
 export const validateUpdateRestaurantReq = getRequestErrors(updateRestaurantValidationsSchema)
 export const validateUpdateRestaurantStatusReq = getRequestErrors(updateRestaurantStatusSchema)
+
+
+export const validateCreateBuildingReq = getRequestErrors(createBuildingSchema)
+export const validateBuildingIdReq = getRequestErrors(validateBuildingIdSchema)
+export const validateUpdateBuildingReq = getRequestErrors(updateBuildingSchema)

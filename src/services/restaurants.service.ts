@@ -12,7 +12,7 @@ import { userService } from "./user.service";
 import { restaurantPubliFields } from "../db/commonSelectQueries";
 
 
-export const createRestaurant = async (
+const createRestaurant = async (
   requestBody: Partial<IRestaurant>
 ): Promise<number | ICustomError> => {
   try {
@@ -64,7 +64,7 @@ export const createRestaurant = async (
   }
 };
 
-export const getRestaurantList = async (): Promise<IRestaurant[] | ICustomError> => {
+const getRestaurantList = async (): Promise<IRestaurant[] | ICustomError> => {
   try {
     const restaurantList = await restaurantRepository.fetchMultipleRestaurants({select: {
       ...restaurantPubliFields
@@ -75,7 +75,7 @@ export const getRestaurantList = async (): Promise<IRestaurant[] | ICustomError>
   }
 }
 
-export const getRestaurantDetails = async (restaurantId: number): Promise<IRestaurant | ICustomError> => {
+const getRestaurantDetails = async (restaurantId: number): Promise<IRestaurant | ICustomError> => {
   try {
     const restaurantDetails = await restaurantRepository.fetchSingleRestaurant({
       where: {
@@ -91,7 +91,7 @@ export const getRestaurantDetails = async (restaurantId: number): Promise<IResta
   }
 }
 
-export const updateRestaurantDetails = async (requestBody: Partial<IRestaurant> & { owner_id: number }): Promise<number | ICustomError> => {
+const updateRestaurantDetails = async (requestBody: Partial<IRestaurant> & { owner_id: number }): Promise<number | ICustomError> => {
   try {
     const roleDetails = await getRoleDetails(roles_enum.RESTAURANT_OWNER)
     // checking if restaurant_owner exist or not
@@ -128,7 +128,7 @@ export const updateRestaurantDetails = async (requestBody: Partial<IRestaurant> 
   }
 }
 
-export const updaterestaurantStatus = async (id: number, status: string): Promise<void | ICustomError> => {
+const updaterestaurantStatus = async (id: number, status: string): Promise<void | ICustomError> => {
   try {
     // checking if restaurant exist
     const restaurant_existence = await restaurantRepository.fetchSingleRestaurant({
@@ -148,4 +148,12 @@ export const updaterestaurantStatus = async (id: number, status: string): Promis
   } catch (error) {
     return handleError(error)
   }
+}
+
+export const restaurantService = {
+  createRestaurant,
+  getRestaurantDetails,
+  getRestaurantList,
+  updateRestaurantDetails,
+  updaterestaurantStatus
 }

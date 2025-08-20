@@ -39,3 +39,11 @@ export const restaurantPubliFields = {
   restaurant_buildings: true,
   restaurant_shifts: true
 }
+
+export const buildingPublicFields = {
+  id: true,
+  name: true,
+  address: true,
+  latitude: true,
+  longitude: true
+}
