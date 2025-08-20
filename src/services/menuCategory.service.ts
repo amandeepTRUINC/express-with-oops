@@ -1,7 +1,7 @@
 import { Prisma } from "@prisma/client";
 import { HTTP_STATUS_CODES, HTTP_STATUS_MESSAGES } from "../constants/common";
 import { ICustomError } from "../interfaces/common.interface";
-import { IMenuCategories } from "../interfaces/menu.category.interface";
+import { IMenuCategory } from "../interfaces/menuCategory.interface";
 import { menuCategoryRepository } from "../repositories/menuCategory.repository";
 import { CustomError } from "../utils/error";
 import { handleError } from "../utils/helperFunctions";
@@ -9,7 +9,7 @@ import { restaurantService } from "./restaurants.service";
 import { menuCategoryPublicFields } from "../db/commonSelectQueries";
 
 
-const createCategory = async (requestBody: IMenuCategories): Promise<number | ICustomError> => {
+const createCategory = async (requestBody: IMenuCategory): Promise<number | ICustomError> => {
   try {
     // checking if restaurant exists or not
     const restaurantDetails = await restaurantService.getRestaurantDetails(requestBody.restaurant_id)
@@ -50,7 +50,7 @@ const createCategory = async (requestBody: IMenuCategories): Promise<number | IC
   }
 }
 
-const getCategoryList = async (): Promise<IMenuCategories[] | ICustomError> => {
+const getCategoryList = async (): Promise<IMenuCategory[] | ICustomError> => {
   try {
     const categoryList = menuCategoryRepository.fetchMultipleCategory({
       orderBy: { display_order: "asc" }, select: {
@@ -63,7 +63,7 @@ const getCategoryList = async (): Promise<IMenuCategories[] | ICustomError> => {
   }
 }
 
-const getCategoryDetails = async (categoryId: number): Promise<IMenuCategories | ICustomError> => {
+const getCategoryDetails = async (categoryId: number): Promise<IMenuCategory | ICustomError> => {
   try {
     const categoryDetails = menuCategoryRepository.fetchSingleCategory({
       where: {
@@ -87,7 +87,7 @@ const getCategoryDetails = async (categoryId: number): Promise<IMenuCategories |
 
 const updateCategoryDetails = async (
   categoryId: number,
-  requestBody: IMenuCategories
+  requestBody: IMenuCategory
 ): Promise<number | ICustomError> => {
   try {
     // check if category exists

@@ -1,6 +1,7 @@
-import { IMenuItem } from "./menu.item.interface"
+import { IMenuItem } from "./menuItem.interface"
 
-export interface IMenuCategories{
+export interface IMenuCategory{
+  id?: number
   name: string
   restaurant_id: number
   is_available: boolean

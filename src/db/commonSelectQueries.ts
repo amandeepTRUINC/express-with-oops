@@ -60,6 +60,12 @@ export const menuItemPublicFields = {
   image_url: true,
   preparation_time: true,
   customizable: true,
+  menu_categories: {
+    select: {
+      id: true,
+      name: true
+    }
+  }
 }
 
 export const menuCategoryPublicFields = {

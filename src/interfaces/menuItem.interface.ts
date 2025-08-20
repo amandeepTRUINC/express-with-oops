@@ -7,7 +7,7 @@ export interface IMenuItem {
   price: number,
   is_available: boolean,
   is_veg: boolean,
-  image_url: string,
+  image_url: string, // TODO- May need to be type buffer
   preparation_time: number,
   customizable: boolean,
 

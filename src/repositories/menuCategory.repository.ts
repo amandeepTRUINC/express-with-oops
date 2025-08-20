@@ -1,6 +1,6 @@
 import { Prisma } from "@prisma/client";
 import { prisma } from "../db/dbConnection";
-import { IMenuCategories } from "../interfaces/menu.category.interface";
+import { IMenuCategory } from "../interfaces/menuCategory.interface";
 
 const createCategory = async (
   data: Prisma.menu_categoriesCreateArgs['data']
@@ -16,10 +16,10 @@ const createCategory = async (
 // Fetch multiple menuCategory
 const fetchMultipleCategory = async (
   whereCondition: Prisma.menu_categoriesFindManyArgs
-): Promise<IMenuCategories[]> => {
+): Promise<IMenuCategory[]> => {
   try {
     const menuCategoryList = await prisma.menu_categories.findMany(whereCondition);
-    return menuCategoryList as unknown as IMenuCategories[];
+    return menuCategoryList as unknown as IMenuCategory[];
   } catch (error) {
     throw error;
   }
@@ -28,10 +28,10 @@ const fetchMultipleCategory = async (
 // Fetch a single restaurant
 const fetchSingleCategory = async (
   whereCondition: Prisma.menu_categoriesFindFirstArgs
-): Promise<IMenuCategories> => {
+): Promise<IMenuCategory> => {
   try {
     const restaurant = await prisma.menu_categories.findFirst(whereCondition);
-    return restaurant as unknown as IMenuCategories;
+    return restaurant as unknown as IMenuCategory;
   } catch (error) {
     throw error;
   }
@@ -57,13 +57,13 @@ const updateMultipleCategories = async (
 const updateSingleCategory = async (
   where: Prisma.menu_categoriesWhereUniqueInput,
   data: Prisma.menu_categoriesUpdateInput
-): Promise<IMenuCategories> => {
+): Promise<IMenuCategory> => {
   try {
     const updated = await prisma.menu_categories.update({
       where,
       data,
     });
-    return updated as unknown as IMenuCategories;
+    return updated as unknown as IMenuCategory;
   } catch (error) {
     throw error;
   }
