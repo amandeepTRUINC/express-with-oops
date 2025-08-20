@@ -47,3 +47,28 @@ export const buildingPublicFields = {
   latitude: true,
   longitude: true
 }
+
+export const menuItemPublicFields = {
+  id: true,
+  restaurant_id: true,
+  name: true,
+  category_id: true,
+  description: true,
+  price: true,
+  is_available: true,
+  is_veg: true,
+  image_url: true,
+  preparation_time: true,
+  customizable: true,
+}
+
+export const menuCategoryPublicFields = {
+  id: true,
+  restaurant_id: true,
+  name: true,
+  is_available: true,
+  display_order: true,
+  menu_items: {
+    select: menuItemPublicFields,   // ✅ wrap in select
+  },
+}

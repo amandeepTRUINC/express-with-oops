@@ -3,17 +3,18 @@ import Joi from 'joi';
 import { AuthenticatedRequest } from '../interfaces/common.interface';
 import { CustomError } from '../utils/error';
 import { handleErrorResponse } from '../utils/helperFunctions';
-import { 
-  createUserValidationsSchema, 
-  updateUserValidationsSchema, 
-  validateUserIdSchema, 
-  validateLoginUserReqSchema, 
+import {
+  createUserValidationsSchema,
+  updateUserValidationsSchema,
+  validateUserIdSchema,
+  validateLoginUserReqSchema,
   validateUpdateStatusSchema,
   validateSearchUserSchema
 } from './users/user.validationsSchema'
 import { HTTP_STATUS_CODES, HTTP_STATUS_MESSAGES } from '../constants/common';
 import { createRestaurantValidationsSchema, updateRestaurantStatusSchema, updateRestaurantValidationsSchema } from './restaurant/restaurant.validationsSchema';
 import { createBuildingSchema, updateBuildingSchema, validateBuildingIdSchema, allocateBuildingSchema, deAllocateBuildingSchema } from './buildings/building.validationsSchema';
+import { createMenuCategorySchema, updateMenuCategorySchema, validateMenuCategoryIdSchema } from './menuCategories/menu.cateogry.validationSchema';
 export const getRequestErrors = (schema: Joi.Schema) => {
   return (
     req: Request<any, any, any, any> | AuthenticatedRequest,
@@ -86,3 +87,9 @@ export const validateBuildingIdReq = getRequestErrors(validateBuildingIdSchema)
 export const validateUpdateBuildingReq = getRequestErrors(updateBuildingSchema)
 export const validateAllocateBuildingReq = getRequestErrors(allocateBuildingSchema)
 export const validateDeAllocateBuildingReq = getRequestErrors(deAllocateBuildingSchema)
+
+
+
+export const validateCreateCategoryReq = getRequestErrors(createMenuCategorySchema)
+export const validateCategoryIdInReq = getRequestErrors(validateMenuCategoryIdSchema)
+export const validateUpdateCategoryReq = getRequestErrors(updateMenuCategorySchema)
