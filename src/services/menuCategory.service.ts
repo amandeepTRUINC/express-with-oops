@@ -2,7 +2,7 @@ import { Prisma } from "@prisma/client";
 import { HTTP_STATUS_CODES, HTTP_STATUS_MESSAGES } from "../constants/common";
 import { ICustomError } from "../interfaces/common.interface";
 import { IMenuCategories } from "../interfaces/menu.category.interface";
-import { menuCategoryRepository } from "../repositories/menu.categories.repository";
+import { menuCategoryRepository } from "../repositories/menuCategory.repository";
 import { CustomError } from "../utils/error";
 import { handleError } from "../utils/helperFunctions";
 import { restaurantService } from "./restaurants.service";

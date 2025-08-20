@@ -1,7 +1,7 @@
 import { Response } from "express";
 import { AuthenticatedRequest } from "../interfaces/common.interface";
 import { handleErrorResponse, handleSuccessResponse } from "../utils/helperFunctions";
-import { menuCategoryService } from "../services/menu.category.service";
+import { menuCategoryService } from "../services/menuCategory.service";
 import { HTTP_STATUS_CODES } from "../constants/common";
 
 export const handleCreateCategoryReq = async (req: AuthenticatedRequest, res: Response): Promise<Response> => {
