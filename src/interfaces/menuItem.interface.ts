@@ -12,3 +12,7 @@ export interface IMenuItem {
   customizable: boolean,
 
 }
+
+export interface IMenuItemFilter {
+  category_id: number
+}

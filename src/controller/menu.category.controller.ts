@@ -3,6 +3,7 @@ import { AuthenticatedRequest } from "../interfaces/common.interface";
 import { handleErrorResponse, handleSuccessResponse } from "../utils/helperFunctions";
 import { menuCategoryService } from "../services/menuCategory.service";
 import { HTTP_STATUS_CODES } from "../constants/common";
+import { CustomError } from "../utils/error";
 
 export const handleCreateCategoryReq = async (req: AuthenticatedRequest, res: Response): Promise<Response> => {
   try {
@@ -26,6 +27,12 @@ export const handleGetCategoryDetailsReq = async (req: AuthenticatedRequest, res
   try {
     const categoryId = parseInt(req.params.id)
     const categoryDetails = await menuCategoryService.getCategoryDetails(categoryId)
+    if (!categoryDetails) {
+      throw new CustomError({
+        message: 'Category Not Found',
+        status: HTTP_STATUS_CODES.NOT_FOUND
+      })
+    }
     return handleSuccessResponse({ res, data: [categoryDetails] })
   } catch (error) {
     return handleErrorResponse(res, error)

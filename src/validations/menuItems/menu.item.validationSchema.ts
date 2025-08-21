@@ -5,7 +5,6 @@ export const validateMenuItemIdSchema = Joi.object({
 })
 
 export const createMenuItemSchema = Joi.object({
-
   restaurant_id: Joi.number().integer().positive().required(),
   name: Joi.string().trim().min(1).max(255).required(),
   category_id: Joi.number().integer().positive().required(),

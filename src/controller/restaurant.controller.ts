@@ -34,7 +34,7 @@ export const handleGetRestaurantDetailsReq = async (req: AuthenticatedRequest, r
     if (!restaurantDetails) {
       throw new CustomError({
         message: 'Restaurant not Found',
-        status: 404
+        status: HTTP_STATUS_CODES.NOT_FOUND
       })
     }
     return handleSuccessResponse({ res, data: [restaurantDetails] })
