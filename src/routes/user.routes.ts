@@ -1,7 +1,7 @@
 import { Router } from 'express';
 
 import { validateCreateUserReq, validateLoginUserReq, validateSearchUserReq, validateUpdateUserReq, validateUpdateUserStatusReq, validateUserIdInReq } from '../validations/index';
-import { handleGetAllUsers, handleGetUserDetails, handleCreateUser, handleUpdateUser, handleDeleteUser, handleUpdateUserRole, handleSearchUser } from '../controller/user.controllers';
+import { handleGetAllUsers, handleGetUserDetails, handleCreateUser, handleUpdateUser, handleDeleteUser, handleUpdateUserRole, handleSearchUser } from '../controller/user.controller';
 import { handleLoginReq } from '../controller/auth.controller';
 import { authGuard } from '../guards/auth.guard';
 import { roleGuard } from '../guards/role.guard';
