@@ -71,6 +71,7 @@ model floors {
   building_id Int
   identifier String
   floor_number Int
+  company_name String?
   status     Boolean? @default(true)
   created_at DateTime @default(now())
   updated_at DateTime @updatedAt

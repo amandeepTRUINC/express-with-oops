@@ -21,7 +21,7 @@ export const handleGetItemListReq = async (req: AuthenticatedRequest, res: Respo
     if (!filter) {
       throw new CustomError({
         message: "Invalid Filter",
-        status: HTTP_STATUS_CODES.FORM_ERROR
+        status: HTTP_STATUS_CODES.BAD_REQUEST
       })
     }
     const itemList = await menuItemService.getMenuItemList({

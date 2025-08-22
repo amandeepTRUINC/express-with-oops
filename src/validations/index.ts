@@ -16,6 +16,7 @@ import { createRestaurantValidationsSchema, updateRestaurantStatusSchema, update
 import { createBuildingSchema, updateBuildingSchema, validateBuildingIdSchema, allocateBuildingSchema, deAllocateBuildingSchema } from './buildings/building.validationsSchema';
 import { createMenuCategorySchema, updateMenuCategorySchema, validateMenuCategoryIdSchema } from './menuCategories/menuCateogry.validationSchema';
 import { createMenuItemSchema, updateMenuItemSchema, validateMenuItemIdSchema } from './menuItems/menu.item.validationSchema';
+import { validateCreateFloorSchema, validateFloorIdSchema, validateUpdateFloorSchema } from './floors/floor.validationsSchema';
 export const getRequestErrors = (schema: Joi.Schema) => {
   return (
     req: Request<any, any, any, any> | AuthenticatedRequest,
@@ -37,8 +38,8 @@ export const getRequestErrors = (schema: Joi.Schema) => {
       return handleErrorResponse(
         res,
         new CustomError({
-          message: HTTP_STATUS_MESSAGES.FORM_ERROR,
-          status: HTTP_STATUS_CODES.FORM_ERROR,
+          message: HTTP_STATUS_MESSAGES.BAD_REQUEST,
+          status: HTTP_STATUS_CODES.BAD_REQUEST,
           extraMessage: validationError
         })
       );
@@ -99,3 +100,12 @@ export const validateUpdateCategoryReq = getRequestErrors(updateMenuCategorySche
 export const validateMenuItemIdInReq = getRequestErrors(validateMenuItemIdSchema)
 export const validateCreateMenuItemInReq = getRequestErrors(createMenuItemSchema)
 export const validateUpdateMenuitemInReq = getRequestErrors(updateMenuItemSchema)
+
+
+
+
+export const validateFloorIdInReq = getRequestErrors(validateFloorIdSchema)
+export const validateCreateFloorInReq = getRequestErrors(validateCreateFloorSchema)
+export const validateUpdateFloorInReq = getRequestErrors(
+  validateUpdateFloorSchema
+)

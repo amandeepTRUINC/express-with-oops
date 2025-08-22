@@ -1,7 +1,7 @@
 export const HTTP_STATUS_CODES = {
   SUCCESS : 200,
   CREATED: 201,
-  FORM_ERROR: 400,
+  BAD_REQUEST: 400,
   UN_AUTHORIZED: 401,
   FORBIDDEN: 403,
   NOT_FOUND: 404,
@@ -12,7 +12,7 @@ export const HTTP_STATUS_CODES = {
 
 export const HTTP_STATUS_MESSAGES = {
   SUCCESS : 'Success',
-  FORM_ERROR: 'Invalid Request',
+  BAD_REQUEST: 'Invalid Request',
   UN_AUTHORIZED: 'Unauthorized Access',
   FORBIDDEN_RESOURCE: 'Forbidden Resource',
   NOT_FOUND: 'Not Found',

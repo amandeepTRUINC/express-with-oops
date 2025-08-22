@@ -26,7 +26,7 @@ export const loginUser = async (body: LoginRequst) => {
     if (!isPasswordValid) {
       throw new CustomError({
         message: HTTP_STATUS_MESSAGES.INVALID_CREDENTIALS,
-        status: HTTP_STATUS_CODES.FORM_ERROR
+        status: HTTP_STATUS_CODES.BAD_REQUEST
       })
     }
     const token = jwt.sign(
