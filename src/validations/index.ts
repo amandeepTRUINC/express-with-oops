@@ -17,6 +17,7 @@ import { createBuildingSchema, updateBuildingSchema, validateBuildingIdSchema, a
 import { createMenuCategorySchema, updateMenuCategorySchema, validateMenuCategoryIdSchema } from './menuCategories/menuCateogry.validationSchema';
 import { createMenuItemSchema, updateMenuItemSchema, validateMenuItemIdSchema } from './menuItems/menu.item.validationSchema';
 import { validateCreateFloorSchema, validateFloorIdSchema, validateUpdateFloorSchema } from './floors/floor.validationsSchema';
+import { createDailMealValidationSchema, validateGetDailyMealsSchema, validateMealIdSchema, validateUpdateDailyMealSchema } from './dailyMeals/dailyMealsValidationSchema';
 export const getRequestErrors = (schema: Joi.Schema) => {
   return (
     req: Request<any, any, any, any> | AuthenticatedRequest,
@@ -108,4 +109,14 @@ export const validateFloorIdInReq = getRequestErrors(validateFloorIdSchema)
 export const validateCreateFloorInReq = getRequestErrors(validateCreateFloorSchema)
 export const validateUpdateFloorInReq = getRequestErrors(
   validateUpdateFloorSchema
+)
+
+
+
+export const validateCreateDailyMealInReq = getRequestErrors(createDailMealValidationSchema)
+export const validateDailyMealIdInReq = getRequestErrors(validateMealIdSchema)
+export const validateUpdateDailyMealInReq = getRequestErrors(validateUpdateDailyMealSchema)
+
+export const validateGetDailyMealsReq = getRequestErrors(
+  validateGetDailyMealsSchema
 )

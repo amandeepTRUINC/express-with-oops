@@ -26,18 +26,18 @@ export const restaurantPubliFields = {
   name: true,
   address: true,
   contact_number: true,
-  users: true,
+  owner: {
+    select: {
+      id: true,
+      name: true,
+      email: true,
+      phone_number: true
+    },
+  },
   is_active: true,
   approval_status: true,
   commission_rate: true,
-  estimated_prep_time: true,
-  menu_categories: true,
-  menu_items: true,
-  ratings: true,
-  offers: true,
-  loyalty_rates: true,
-  restaurant_buildings: true,
-  restaurant_shifts: true
+  estimated_prep_time: true
 }
 
 export const buildingPublicFields = {

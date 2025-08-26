@@ -5,6 +5,7 @@ import buildingRoutes from './building.route'
 import menuCategoryRoutes from './menuCategory.route'
 import menuItemRoutes from './menuItem.route'
 import floorRoutes from './floor.route'
+import dailyMealsRoutes from './dailyMeal.route'
 function RegisterRoutes(appInstance: Express) {
 
   appInstance.use("/api/v1/users", userRoutes);
@@ -13,7 +14,7 @@ function RegisterRoutes(appInstance: Express) {
   appInstance.use('/api/v1/menu-categories', menuCategoryRoutes)
   appInstance.use('/api/v1/menu-items', menuItemRoutes)
   appInstance.use('/api/v1/floors', floorRoutes)
-
+  appInstance.use('/api/v1/daily-meals', dailyMealsRoutes)
 }
 
 export default RegisterRoutes;
