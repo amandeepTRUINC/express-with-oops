@@ -78,3 +78,14 @@ export const menuCategoryPublicFields = {
     select: menuItemPublicFields,   // ✅ wrap in select
   },
 }
+
+export const cartItemDetailsPublicFields = {
+  id: true,
+  user_id: true,
+  menu_item_id: true,
+  quantity: true,
+  customization: true,
+  menu_items: {
+    select: menuItemPublicFields
+  }
+}

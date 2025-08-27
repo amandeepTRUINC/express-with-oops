@@ -6,6 +6,7 @@ import menuCategoryRoutes from './menuCategories/menuCategory.route'
 import menuItemRoutes from './menuItems/menuItem.route'
 import floorRoutes from './floors/floor.route'
 import dailyMealsRoutes from './dailyMeals/dailyMeal.route'
+import cartItemRoutes from './cartItems/cartItems.route'
 
 function RegisterRoutes(appInstance: Express) {
 
@@ -16,6 +17,7 @@ function RegisterRoutes(appInstance: Express) {
   appInstance.use('/api/v1/menu-items', menuItemRoutes)
   appInstance.use('/api/v1/floors', floorRoutes)
   appInstance.use('/api/v1/daily-meals', dailyMealsRoutes)
+  appInstance.use('/api/v1/cart-items', cartItemRoutes)
 }
 
 export default RegisterRoutes;

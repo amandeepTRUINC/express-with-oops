@@ -18,6 +18,7 @@ import { createMenuCategorySchema, updateMenuCategorySchema, validateMenuCategor
 import { createMenuItemSchema, updateMenuItemSchema, validateMenuItemIdSchema } from './menuItems/menu.item.validationSchema';
 import { validateCreateFloorSchema, validateFloorIdSchema, validateUpdateFloorSchema } from './floors/floor.validationsSchema';
 import { createDailMealValidationSchema, validateGetDailyMealsSchema, validateMealIdSchema, validateUpdateDailyMealSchema } from './dailyMeals/dailyMealsValidationSchema';
+import { cartItemIdValidationSchema, createCartItemValidationSchema, updateCartItemValidationSchema } from './cartItems/cartItems.validationSchema';
 export const getRequestErrors = (schema: Joi.Schema) => {
   return (
     req: Request<any, any, any, any> | AuthenticatedRequest,
@@ -120,3 +121,7 @@ export const validateUpdateDailyMealInReq = getRequestErrors(validateUpdateDaily
 export const validateGetDailyMealsReq = getRequestErrors(
   validateGetDailyMealsSchema
 )
+
+export const validateCartItemIdInReq = getRequestErrors(cartItemIdValidationSchema)
+export const validateCreateCartItemInReq = getRequestErrors(createCartItemValidationSchema)
+export const validateUpdateCartItemInReq = getRequestErrors(updateCartItemValidationSchema)
