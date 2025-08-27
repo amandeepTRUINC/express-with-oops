@@ -1,5 +1,5 @@
 import { Response } from "express";
-import { GlobalResponse } from "../interfaces/common.interface";
+import { GlobalResponse } from "../interfaces/shared/common.interface";
 import { CustomError } from "./error";
 import bcrypt from 'bcrypt';
 import { HTTP_STATUS_CODES, HTTP_STATUS_MESSAGES } from "../constants/common";

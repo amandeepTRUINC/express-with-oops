@@ -2,9 +2,9 @@ import { NextFunction, Request, Response } from "express";
 import { handleErrorResponse } from "../utils/helperFunctions";
 import { CustomError } from "../utils/error";
 import jwt from 'jsonwebtoken'
-import { userService } from "../services/user.service";
-import { AuthenticatedRequest } from "../interfaces/common.interface";
-import { IUser } from "../interfaces/user.interface";
+import { userService } from "../services/users/user.service";
+import { AuthenticatedRequest } from "../interfaces/shared/common.interface";
+import { IUser } from "../interfaces/users/user.interface";
 import { HTTP_STATUS_CODES, HTTP_STATUS_MESSAGES } from "../constants/common";
 export const authGuard = async (req: Request, res: Response, next: NextFunction) => {
   try {

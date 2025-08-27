@@ -1,5 +1,5 @@
 import Joi from "joi";
-import { enum_restaurant_approval_status } from "../../interfaces/restaurants.interface";
+import { enum_restaurant_approval_status } from "../../interfaces/restaurants/restaurants.interface";
 
 export const createRestaurantValidationsSchema = Joi.object({
   name: Joi.string().trim().min(3).max(100).required(),

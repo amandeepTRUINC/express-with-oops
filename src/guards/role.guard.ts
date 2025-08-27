@@ -1,5 +1,5 @@
 import { NextFunction, Response } from "express"
-import { AuthenticatedRequest } from "../interfaces/common.interface"
+import { AuthenticatedRequest } from "../interfaces/shared/common.interface"
 import { CustomError } from "../utils/error"
 import { handleErrorResponse } from "../utils/helperFunctions"
 import { HTTP_STATUS_CODES, HTTP_STATUS_MESSAGES } from "../constants/common"

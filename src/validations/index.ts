@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from 'express';
 import Joi from 'joi';
-import { AuthenticatedRequest } from '../interfaces/common.interface';
+import { AuthenticatedRequest } from '../interfaces/shared/common.interface';
 import { CustomError } from '../utils/error';
 import { handleErrorResponse } from '../utils/helperFunctions';
 import {

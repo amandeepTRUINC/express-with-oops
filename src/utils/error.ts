@@ -1,4 +1,4 @@
-import { ICustomError } from "../interfaces/common.interface";
+import { ICustomError } from "../interfaces/shared/common.interface";
 
 export class CustomError implements ICustomError {
   public message: string;

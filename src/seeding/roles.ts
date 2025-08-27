@@ -1,5 +1,5 @@
-import rolesRepository from '../repositories/roles.repository';
-import { roles_enum } from '../interfaces/roles.interface';
+import rolesRepository from '../repositories/roles/roles.repository';
+import { roles_enum } from '../interfaces/roles/roles.interface';
 import { prisma } from '../db/dbConnection';
 
 // FIX 1: Convert enum to array of role names (just values, not entries)
