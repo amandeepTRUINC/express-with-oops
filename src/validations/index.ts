@@ -20,6 +20,7 @@ import { validateCreateFloorSchema, validateFloorIdSchema, validateUpdateFloorSc
 import { createDailMealValidationSchema, validateGetDailyMealsSchema, validateMealIdSchema, validateUpdateDailyMealSchema } from './dailyMeals/dailyMealsValidationSchema';
 import { cartItemIdValidationSchema, createCartItemValidationSchema, updateCartItemValidationSchema } from './cartItems/cartItems.validationSchema';
 import { createOrderValidationSchema, orderIdValidationSchema, orderStatusValidationSchema } from './orders/order.validationSchema';
+import { createRatingSchema, ratingIdSchema, updateRatingSchema } from './ratings/ratingsValidationSchema';
 export const getRequestErrors = (schema: Joi.Schema) => {
   return (
     req: Request<any, any, any, any> | AuthenticatedRequest,
@@ -118,7 +119,6 @@ export const validateUpdateFloorInReq = getRequestErrors(
 export const validateCreateDailyMealInReq = getRequestErrors(createDailMealValidationSchema)
 export const validateDailyMealIdInReq = getRequestErrors(validateMealIdSchema)
 export const validateUpdateDailyMealInReq = getRequestErrors(validateUpdateDailyMealSchema)
-
 export const validateGetDailyMealsReq = getRequestErrors(
   validateGetDailyMealsSchema
 )
@@ -131,3 +131,7 @@ export const validateUpdateCartItemInReq = getRequestErrors(updateCartItemValida
 export const validateCreateOrderInReq = getRequestErrors(createOrderValidationSchema)
 export const validateOrderIdInReq = getRequestErrors(orderIdValidationSchema)
 export const validateOrderStatusInReq = getRequestErrors(orderStatusValidationSchema)
+
+export const validateCreateRatingInReq = getRequestErrors(createRatingSchema)
+export const validateRatingIdInReq = getRequestErrors(ratingIdSchema)
+export const validateUpdateRatingInReq = getRequestErrors(updateRatingSchema)
