@@ -40,14 +40,13 @@ model users {
   roles          roles?               @relation(fields: [role_id], references: [id])
   restaurants    restaurants[]        @relation("OwnerRestaurants")
   cart_items     cart_items[]
-  address_book   address_book[]
   orders         orders[]
   ratings        restaurant_ratings[]
   loyalty_points loyalty_points[]
 
   // Building/Floor relations for customers
-  building buildings? @relation(fields: [building_id], references: [id])
-  floor    floors?    @relation(fields: [floor_id], references: [id])
+  building buildings? @relation(fields: [building_id], references: [id], onDelete: Cascade)
+  floor    floors?    @relation(fields: [floor_id], references: [id], onDelete: Cascade)
 }
 
 model buildings {
@@ -77,7 +76,7 @@ model floors {
   updated_at   DateTime @updatedAt
 
   // Relations
-  building buildings @relation(fields: [building_id], references: [id])
+  building buildings @relation(fields: [building_id], references: [id], onDelete: Cascade)
   users    users[] // Customers on this floor
 
   @@unique([building_id, floor_number])
@@ -97,7 +96,7 @@ model restaurants {
   updated_at          DateTime @updatedAt
 
   // Relations
-  owner                users?                 @relation("OwnerRestaurants", fields: [owner_id], references: [id])
+  owner                users?                 @relation("OwnerRestaurants", fields: [owner_id], references: [id], onDelete: Cascade)
   menu_categories      menu_categories[]
   menu_items           menu_items[]
   orders               orders[]
@@ -145,7 +144,7 @@ model menu_categories {
   updated_at    DateTime @updatedAt
 
   // Relations
-  restaurants restaurants? @relation(fields: [restaurant_id], references: [id])
+  restaurants restaurants? @relation(fields: [restaurant_id], references: [id], onDelete: Cascade)
   menu_items  menu_items[]
 }
 
@@ -165,8 +164,8 @@ model menu_items {
   updated_at       DateTime @updatedAt
 
   // Relations
-  restaurants     restaurants?     @relation(fields: [restaurant_id], references: [id])
-  menu_categories menu_categories? @relation(fields: [category_id], references: [id])
+  restaurants     restaurants?     @relation(fields: [restaurant_id], references: [id], onDelete: Cascade)
+  menu_categories menu_categories? @relation(fields: [category_id], references: [id], onDelete: Cascade)
   daily_meals     daily_meals[]
   cart_items      cart_items[]
   order_items     order_items[]
@@ -183,8 +182,8 @@ model daily_meals {
   updated_at    DateTime    @updatedAt
   description   String
   // Relations
-  restaurants   restaurants @relation(fields: [restaurant_id], references: [id])
-  menu_items    menu_items? @relation(fields: [menu_item_id], references: [id])
+  restaurants   restaurants @relation(fields: [restaurant_id], references: [id], onDelete: Cascade)
+  menu_items    menu_items? @relation(fields: [menu_item_id], references: [id], onDelete: Cascade)
 }
 
 model cart_items {
@@ -197,28 +196,13 @@ model cart_items {
   updated_at    DateTime @updatedAt
 
   // Relations
-  users      users?      @relation(fields: [user_id], references: [id])
-  menu_items menu_items? @relation(fields: [menu_item_id], references: [id])
+  users      users?      @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  menu_items menu_items? @relation(fields: [menu_item_id], references: [id], onDelete: Cascade)
 }
 
 model order_status {
   id     Int      @id @default(autoincrement())
   status String   @unique // pending, accepted, in_progress, ready, completed, cancelled
-  orders orders[]
-}
-
-model address_book {
-  id         Int      @id @default(autoincrement())
-  user_id    Int?
-  label      String?
-  address    String?
-  latitude   Float?
-  longitude  Float?
-  created_at DateTime @default(now())
-  updated_at DateTime @updatedAt
-
-  // Relations
-  users  users?   @relation(fields: [user_id], references: [id])
   orders orders[]
 }
 
@@ -235,7 +219,6 @@ model orders {
   loyalty_discount     Int       @default(0) // Loyalty points discount
   total_amount         Int // Final amount customer pays
   restaurant_amount    Int // Amount restaurant receives (subtotal - commission)
-  delivery_address_id  Int?
   estimated_time       Int? // Estimated preparation time in minutes
   special_instructions String?
   can_cancel           Boolean   @default(true) // Based on order status
@@ -244,10 +227,9 @@ model orders {
   completed_at         DateTime?
 
   // Relations
-  users        users?        @relation(fields: [user_id], references: [id])
-  restaurants  restaurants?  @relation(fields: [restaurant_id], references: [id])
-  order_status order_status? @relation(fields: [order_status_id], references: [id])
-  address_book address_book? @relation(fields: [delivery_address_id], references: [id])
+  users        users?        @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  restaurants  restaurants?  @relation(fields: [restaurant_id], references: [id], onDelete: Cascade)
+  order_status order_status? @relation(fields: [order_status_id], references: [id], onDelete: Cascade)
   order_items  order_items[]
   payments     payments[]
 }
@@ -262,8 +244,8 @@ model order_items {
   customization String? // JSON string for custom requirements
 
   // Relations
-  orders     orders?     @relation(fields: [order_id], references: [id])
-  menu_items menu_items? @relation(fields: [menu_item_id], references: [id])
+  orders     orders?     @relation(fields: [order_id], references: [id], onDelete: Cascade)
+  menu_items menu_items? @relation(fields: [menu_item_id], references: [id], onDelete: Cascade)
 }
 
 model payments {
@@ -294,7 +276,7 @@ model restaurant_ratings {
 
   // Relations
   user       users       @relation(fields: [user_id], references: [id])
-  restaurant restaurants @relation(fields: [restaurant_id], references: [id])
+  restaurant restaurants @relation(fields: [restaurant_id], references: [id], onDelete: Cascade)
 
   @@unique([user_id, restaurant_id]) // One rating per user per restaurant
 }
@@ -323,7 +305,7 @@ model loyalty_points {
   created_at       DateTime  @default(now())
 
   // Relations
-  user users @relation(fields: [user_id], references: [id])
+  user users @relation(fields: [user_id], references: [id], onDelete: Cascade)
 }
 
 model offers {

@@ -5,6 +5,7 @@ export enum enum_restaurant_approval_status {
   REJECTED = 'rejected'
 }
 
+// TODO - Need to add delivery charges
 export interface IRestaurant {
   id: number
   name: string

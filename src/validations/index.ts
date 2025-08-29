@@ -15,10 +15,11 @@ import { HTTP_STATUS_CODES, HTTP_STATUS_MESSAGES } from '../constants/common';
 import { createRestaurantValidationsSchema, updateRestaurantStatusSchema, updateRestaurantValidationsSchema } from './restaurant/restaurant.validationsSchema';
 import { createBuildingSchema, updateBuildingSchema, validateBuildingIdSchema, allocateBuildingSchema, deAllocateBuildingSchema } from './buildings/building.validationsSchema';
 import { createMenuCategorySchema, updateMenuCategorySchema, validateMenuCategoryIdSchema } from './menuCategories/menuCateogry.validationSchema';
-import { createMenuItemSchema, updateMenuItemSchema, validateMenuItemIdSchema } from './menuItems/menu.item.validationSchema';
+import { createMenuItemSchema, updateMenuItemSchema, validateMenuItemIdSchema } from './menuItems/menuItem.validationSchema';
 import { validateCreateFloorSchema, validateFloorIdSchema, validateUpdateFloorSchema } from './floors/floor.validationsSchema';
 import { createDailMealValidationSchema, validateGetDailyMealsSchema, validateMealIdSchema, validateUpdateDailyMealSchema } from './dailyMeals/dailyMealsValidationSchema';
 import { cartItemIdValidationSchema, createCartItemValidationSchema, updateCartItemValidationSchema } from './cartItems/cartItems.validationSchema';
+import { createOrderValidationSchema, orderIdValidationSchema, orderStatusValidationSchema } from './orders/order.validationSchema';
 export const getRequestErrors = (schema: Joi.Schema) => {
   return (
     req: Request<any, any, any, any> | AuthenticatedRequest,
@@ -125,3 +126,8 @@ export const validateGetDailyMealsReq = getRequestErrors(
 export const validateCartItemIdInReq = getRequestErrors(cartItemIdValidationSchema)
 export const validateCreateCartItemInReq = getRequestErrors(createCartItemValidationSchema)
 export const validateUpdateCartItemInReq = getRequestErrors(updateCartItemValidationSchema)
+
+
+export const validateCreateOrderInReq = getRequestErrors(createOrderValidationSchema)
+export const validateOrderIdInReq = getRequestErrors(orderIdValidationSchema)
+export const validateOrderStatusInReq = getRequestErrors(orderStatusValidationSchema)

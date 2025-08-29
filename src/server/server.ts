@@ -3,6 +3,7 @@ import dotenv from 'dotenv';
 import RegisterRoutes from '../routes';
 import { seedDefaultRoles } from '../seeding/roles';
 import { seedDefaultUsers } from '../seeding/users';
+import { seedDefaultOrderStatus } from '../seeding/orderStatus';
 
 dotenv.config();
 
@@ -16,6 +17,7 @@ const addDefaultDataAndStartServer = async () => {
   console.log("###### ADDING DEFAULT DATA #####")
   await seedDefaultRoles()
   await seedDefaultUsers()
+  await seedDefaultOrderStatus()
   console.log("#### Default Data Added Successfully ####")
   app.listen(APP_PORT, () => {
     console.log(`Server is running at http://localhost:${APP_PORT}`);

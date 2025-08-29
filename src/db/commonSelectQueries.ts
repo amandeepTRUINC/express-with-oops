@@ -89,3 +89,38 @@ export const cartItemDetailsPublicFields = {
     select: menuItemPublicFields
   }
 }
+
+export const orderDetailsPublicFields = {
+  id: true,
+  user_id: true,
+  restaurant_id: true,
+  order_status: {
+    select: {
+      id: true,
+      name: true
+    }
+  },
+  order_number: true,
+  order_type: true,
+  rejected_reason: true,
+  loyalty_discount: true,
+  total_amount: true,
+  delivery_address: true,
+  estimated_time: true,
+  special_instructions: true,
+  can_cancel: true,
+  order_items: {
+    select: {
+      id: true,
+      order_id: true,
+      menu_item_id: true,
+      quantity: true,
+      unit_price: true,
+      total_price: true,
+      customizations: true,
+      menu_items: {
+        select: menuItemPublicFields
+      }
+    }
+  }
+}

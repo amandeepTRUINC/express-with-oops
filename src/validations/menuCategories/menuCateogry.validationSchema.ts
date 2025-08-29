@@ -1,5 +1,5 @@
 import Joi from "joi";
-import { createMenuItemSchema } from "../menuItems/menu.item.validationSchema";
+import { createMenuItemSchema } from "../menuItems/menuItem.validationSchema";
 
 export const createMenuCategorySchema = Joi.object({
   name: Joi.string().trim().min(1).max(255).required(),
